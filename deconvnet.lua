@@ -3,7 +3,7 @@ require 'xlua'
 require 'torch'
 require 'nn'
 
-require 'linearCR'
+require 'LinearCR'
 require 'Reparametrize'
 require 'Adagrad'
 require 'SpatialDeconvolution'
@@ -11,10 +11,11 @@ require 'KLDCriterion'
 require 'BCECriterion'
 
 ------------------------------------------------------------
--- convolutional network
+-- deconvolutional network
 ------------------------------------------------------------
--- Grey Images
--- stage 1 : 3 input channels, 10 output, 5x5 filter, 2x2 stride
+-- torch.setnumthreads(2)
+-- print('<torch> set nb of threads to ' .. torch.getnumthreads())
+
 local filter_size = 4
 local stride = 4
 local dim_hidden = 100
@@ -23,6 +24,9 @@ local input_size = 32
 -- NOT GENERIC 
 local map_size = (input_size / stride) ^ 2
 local feature_maps = 10
+
+batchSize = 100
+learningRate = 0.05
 
 encoder = nn.Sequential()
 encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
@@ -37,10 +41,10 @@ encoder:add(z)
 
 decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
-decoder:add(nn.Reshape(map_size,feature_maps))
+decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
 decoder:add(nn.SpatialDeconvolution(feature_maps,3,stride))
 decoder:add(nn.Sigmoid())
-decoder:add(nn.Reshape(100,3072))
+decoder:add(nn.Reshape(batchSize,3072))
 
 model = nn.Sequential()
 model:add(encoder)
@@ -111,14 +115,10 @@ testData.labels = testData.labels + 1
 trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
 testData.data = testData.data:div(255):reshape(tesize,3,32,32)
 
-
-
-
 epoch = 0
-batchSize = 100
-learningRate = 0.01
 
-adaGradInitRounds = 2
+
+adaGradInitRounds = 5
 h = adaGradInit(trainData.data, opfunc, adaGradInitRounds)
 
 while true do

@@ -17,11 +17,6 @@ end
 
 
 function SpatialDeconvolution:updateOutput(input)
-
-  local batchsize = input:size(1)
-
-  input = input:reshape(input:size(1) * input:size(2),input:size(3))
-
   self.output:resize(input:size(1), self.weight:size(1))
   self.output:mm(input, self.weight:t())
 
@@ -35,6 +30,6 @@ end
 
 function SpatialDeconvolution:accGradParameters(input, gradOutput, scale)
    scale = scale or 1
-   input_reshaped = input:reshape(6400,10)
-   self.gradWeight:addmm(scale, gradOutput:t(), input_reshaped)
+   self.gradWeight:addmm(scale, gradOutput:t(), input)
+   return self.gradWeight
 end
