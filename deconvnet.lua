@@ -1,4 +1,5 @@
 require 'sys'
+require 'xlua'
 require 'torch'
 require 'nn'
 
@@ -6,8 +7,8 @@ require 'linearCR'
 require 'Reparametrize'
 require 'Adagrad'
 require 'SpatialDeconvolution'
-require 'GaussianCriterion'
 require 'KLDCriterion'
+require 'BCECriterion'
 
 ------------------------------------------------------------
 -- convolutional network
@@ -25,7 +26,7 @@ local feature_maps = 10
 
 encoder = nn.Sequential()
 encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
-encoder:add(nn.SoftPlus())
+encoder:add(nn.Threshold(0,0))
 encoder:add(nn.Reshape(feature_maps * map_size))
 
 z = nn.ConcatTable()
@@ -38,25 +39,36 @@ decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Reshape(map_size,feature_maps))
 decoder:add(nn.SpatialDeconvolution(feature_maps,3,stride))
+decoder:add(nn.Sigmoid())
+decoder:add(nn.Reshape(100,3072))
 
 model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
 
-Gaussian = nn.GaussianCriterion()
+BCE = nn.BCECriterion()
 KLD = nn.KLDCriterion()
+
+function display(input)
+  require 'image'
+  gfx.image(input, {zoom=10, legend=''})
+end
 
 opfunc = function(batch) 
     model:zeroGradParameters()
 
     f = model:forward(batch)
-    err = Gaussian:forward(f, batch)
-    df_dw = Gaussian:backward(f, batch)
+
+    local target = batch:reshape(100,3072)
+
+    err = BCE:forward(f, target)
+    df_dw = BCE:backward(f, target)
+
     model:backward(batch,df_dw)
 
-    KLDerr = KLD:forward(model:get(1).output, batch)
-    dKLD_dw = KLD:backward(model:get(1).output, batch)
+    KLDerr = KLD:forward(model:get(1).output, target)
+    dKLD_dw = KLD:backward(model:get(1).output, target)
     encoder:backward(batch,dKLD_dw)
 
     lowerbound = err  + KLDerr
@@ -96,11 +108,18 @@ testData = {
 testData.labels = testData.labels + 1
 
 -- reshape data
-trainData.data = trainData.data:reshape(trsize,3,32,32)
-testData.data = testData.data:reshape(tesize,3,32,32)
+trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
+testData.data = testData.data:div(255):reshape(tesize,3,32,32)
 
-local epoch = 0
-local batchSize = 100
+
+
+
+epoch = 0
+batchSize = 100
+learningRate = 0.01
+
+adaGradInitRounds = 2
+h = adaGradInit(trainData.data, opfunc, adaGradInitRounds)
 
 while true do
     epoch = epoch + 1
@@ -111,7 +130,7 @@ while true do
 
     for i = 1, N, batchSize do
         local iend = math.min(N,i+batchSize-1)
-        -- xlua.progress(iend, N)
+        xlua.progress(iend, N)
 
         local batch = torch.Tensor(iend-i+1,trainData.data:size(2),32,32)
 
@@ -124,4 +143,5 @@ while true do
         batchlowerbound = adaGradUpdate(batch, opfunc, h)
         lowerbound = lowerbound + batchlowerbound
     end
+    print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
 end

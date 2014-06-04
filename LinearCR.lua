@@ -3,6 +3,7 @@ local LinearCR, parent = torch.class('nn.LinearCR', 'nn.Linear')
 --Custom reset function
 function LinearCR:__init(inputSize, outputSize)
     parent.__init(self, inputSize, outputSize)
+    self:reset()
 end
 
 function LinearCR:reset()
