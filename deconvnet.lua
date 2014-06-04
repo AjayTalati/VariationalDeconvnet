@@ -3,6 +3,12 @@ require 'xlua'
 require 'torch'
 require 'nn'
 
+-- Remember to start server!
+-- luajit -lgfx.start
+-- luajit -lgfx.stop
+gfx = require 'gfx.js'
+
+
 require 'LinearCR'
 require 'Reparametrize'
 require 'Adagrad'
@@ -54,9 +60,8 @@ model:add(decoder)
 BCE = nn.BCECriterion()
 KLD = nn.KLDCriterion()
 
-function display(input)
-  require 'image'
-  gfx.image(input, {zoom=10, legend=''})
+function display(input, reconstruction)
+  gfx.image({input:reshape(3,32,32), reconstruction:reshape(3,32,32)}, {zoom=9, legends={'Input', 'Reconstruction'}})
 end
 
 opfunc = function(batch) 
@@ -132,7 +137,7 @@ while true do
         local iend = math.min(N,i+batchSize-1)
         xlua.progress(iend, N)
 
-        local batch = torch.Tensor(iend-i+1,trainData.data:size(2),32,32)
+        batch = torch.Tensor(iend-i+1,trainData.data:size(2),32,32)
 
         local k = 1
         for j = i,iend do
@@ -144,4 +149,16 @@ while true do
         lowerbound = lowerbound + batchlowerbound
     end
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
+
+    if epoch % 2 == 0 and epoch ~= 0 then
+      display(batch[{{1},{},{},{}}], f[{{1},{}}])
+    end
+
+    if epoch % 2 == 0 and epoch ~= 0 then
+        print("Saving weights...")
+        weights, bias = model:getParameters()
+        torch.save('params/' .. epoch .. '_weight', weights)
+        torch.save('params/' .. epoch .. '_bias', bias)
+        torch.save('params/' .. epoch .. '_adagrad', h)
+    end
 end
