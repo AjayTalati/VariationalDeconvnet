@@ -13,17 +13,26 @@ end
 function SpatialDeconvolution:reset()
     sigmaInit = 0.01
     self.weight:normal(0, 0.01)
-    self.bias:normal(0, 0.01)
 end
 
 
 function SpatialDeconvolution:updateOutput(input)
-   local nframe = input:size(1)
-   local nunit = self.weight:size(1)
+   local batchsize = input:size(1)
 
-   self.output:resize(nframe, nunit)
+   input = input:reshape(input:size(1) * input:size(2),input:size(3))
+
+   self.output:resize(input:size(1), self.weight:size(1))
+
+   print(input)
+   print(self.weight:t())
    self.output:mm(input, self.weight:t())
 
+   -- self.output = self.output:resize(100,64,48)
+    -- self.output = self.output:resize(6400,4,4,3)
+    -- self.output = self.output:resize(25600,4,3)
+    -- self.output = self.output:resize(3200,32,3)
+    -- self.output = self.output:resize(100,32,32,3)
+    self.output = self.output:resize(100,3,32,32)
    return self.output
 end
 
