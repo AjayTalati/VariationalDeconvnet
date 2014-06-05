@@ -87,7 +87,7 @@ opfunc = function(batch)
     return weights, grads, lowerbound
 end
 
-local trsize = 20000
+local trsize = 50000
 local tesize = 10000
 
 
@@ -98,7 +98,7 @@ trainData = {
    size = function() return trsize end
 }
 
-for i = 0,1 do
+for i = 0,4 do
   subset = torch.load('cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
   trainData.data[{ {i*10000+1, (i+1)*10000} }] = subset.data:t()
   trainData.labels[{ {i*10000+1, (i+1)*10000} }] = subset.labels
@@ -125,6 +125,7 @@ epoch = 0
 
 adaGradInitRounds = 5
 h = adaGradInit(trainData.data, opfunc, adaGradInitRounds)
+lowerboundlist = {}
 
 while true do
     epoch = epoch + 1
@@ -149,16 +150,18 @@ while true do
         lowerbound = lowerbound + batchlowerbound
     end
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
+    table.insert(lowerboundlist, lowerbound/N)
 
-    if epoch % 2 == 0 and epoch ~= 0 then
-      display(batch[{{1},{},{},{}}], f[{{1},{}}])
-    end
+    -- if epoch % 2 == 0 and epoch ~= 0 then
+    --   display(batch[{{1},{},{},{}}], f[{{1},{}}])
+    -- end
 
-    if epoch % 2 == 0 and epoch ~= 0 then
+    if epoch % 5 == 0 and epoch ~= 0 then
         print("Saving weights...")
         weights, bias = model:getParameters()
-        torch.save('params/' .. epoch .. '_weight', weights)
-        torch.save('params/' .. epoch .. '_bias', bias)
-        torch.save('params/' .. epoch .. '_adagrad', h)
+        torch.save('params/' .. epoch .. '_weight.t7', weights)
+        torch.save('params/' .. epoch .. '_bias.t7', bias)
+        torch.save('params/' .. epoch .. '_adagrad.t7', h)
+        torch.save('params/lowerbound.t7', torch.Tensor(lowerboundlist))
     end
 end
