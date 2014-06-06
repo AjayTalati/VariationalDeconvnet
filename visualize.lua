@@ -8,10 +8,8 @@ require 'nn'
 -- luajit -lgfx.stop
 gfx = require 'gfx.js'
 
-
 require 'LinearCR'
 require 'Reparametrize'
-require 'Adagrad'
 require 'SpatialDeconvolution'
 
 
@@ -19,53 +17,44 @@ require 'SpatialDeconvolution'
 -- deconvolutional network
 ------------------------------------------------------------
 -- torch.setnumthreads(2)
--- print('<torch> set nb of threads to ' .. torch.getnumthreads())
-
-local filter_size = 4
-local stride = 4
-local dim_hidden = 100
-local input_size = 32
-
--- NOT GENERIC 
-local map_size = (input_size / stride) ^ 2
-local feature_maps = 10
-
-batchSize = 100
-learningRate = 0.05
-
-encoder = nn.Sequential()
-encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
-encoder:add(nn.Threshold(0,0))
-encoder:add(nn.Reshape(feature_maps * map_size))
-
-z = nn.ConcatTable()
-z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
-z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
-
-encoder:add(z)
-
-decoder = nn.Sequential()
-decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
-decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
-decoder:add(nn.SpatialDeconvolution(feature_maps,3,stride))
-decoder:add(nn.Sigmoid())
-decoder:add(nn.Reshape(batchSize,3072))
-
-model = nn.Sequential()
-model:add(encoder)
-model:add(nn.Reparametrize(dim_hidden))
-model:add(decoder)
-
+-- print('<torch> set nb of threads to ' .. torch.getnumthreads()
 
 
 function display(reconstruction, input)
   gfx.image({input:reshape(3,32,32), reconstruction:reshape(3,32,32)}, {zoom=9, legends={'Input', 'Reconstruction'}})
 end
 
-epoch = 22
+epoch = 42
+
+model = torch.load('params/model')
 
 weights, gradients = model:getParameters()
 weights:copy(torch.load('params/' .. epoch .. '_weights.t7'))
+
+featuremaps = weights[{{1,30*3*4*4}}]:reshape(30,3,4,4)
+
+features = {}
+for i=1,30 do
+	table.insert(features,featuremaps[{{i},{1},{},{}}]:squeeze())
+end
+
+gfx.image(features,{zoom=20, legends = {'','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''}})
+
+features = {}
+for i=1,30 do
+	table.insert(features,featuremaps[{{i},{2},{},{}}]:squeeze())
+end
+
+gfx.image(features,{zoom=20, legends = {'','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''}})
+
+features = {}
+for i=1,30 do
+	table.insert(features,featuremaps[{{i},{3},{},{}}]:squeeze())
+end
+
+gfx.image(features,{zoom=20, legends = {'','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''}})
+
+io.read()
 
 local trsize = 10000
 
