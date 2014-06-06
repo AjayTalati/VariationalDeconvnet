@@ -11,8 +11,8 @@ function SpatialDeconvolution:__init(inputSize, outputSize,factor)
 end
 
 function SpatialDeconvolution:reset()
-    sigmaInit = 0.01
-    self.weight:normal(0, 0.01)
+    local sigmaInit = 0.01
+    self.weight:normal(0, sigmaInit)
 end
 
 
@@ -29,7 +29,7 @@ function SpatialDeconvolution:updateGradInput(input, gradOutput)
 end
 
 function SpatialDeconvolution:accGradParameters(input, gradOutput, scale)
-   scale = scale or 1
+   local scale = scale or 1
    self.gradWeight:addmm(scale, gradOutput:t(), input)
    return self.gradWeight
 end

@@ -1,4 +1,4 @@
-function adaGradInit(data, opfunc,adaGradInitRounds)
+function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
     local h = {}
     for i = 1, batchSize*adaGradInitRounds+1, batchSize do
         local batch = data[{{i,i+batchSize-1}}]
@@ -18,7 +18,8 @@ function adaGradInit(data, opfunc,adaGradInitRounds)
     return h
 end
 
-function adaGradUpdate(batch, opfunc, h)
+function adaGradUpdate(batch, N, learningRate, opfunc, h)
+    local batchSize = batch:size(1)
     local weights, grads, lowerbound = opfunc(batch)
 
     for i=1,#h do
@@ -26,7 +27,7 @@ function adaGradUpdate(batch, opfunc, h)
 
         local prior = 0
         if i % 2 ~= 0 then
-            prior = -torch.mul(weights[i],0.5):mul(batchSize/trainData.data:size(1))
+            prior = -torch.mul(weights[i],0.5):mul(batchSize/N)
         end
 
         local update = torch.Tensor(h[i]:size()):fill(learningRate)
