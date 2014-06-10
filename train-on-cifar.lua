@@ -72,7 +72,7 @@ if opt.network == '' then
       -- stage 1 : mean+std normalization -> filter bank -> squashing -> max pooling
       model:add(nn.SpatialConvolutionMap(nn.tables.random(3,16,1), 5, 5))
       model:add(nn.Tanh())
-      model:add(nn.SpatialMaxPooling(2, 2, 2, 2))
+      model:add(nn.SpatialMaxPooling(0, 0, 0, 0))
       -- stage 2 : filter bank -> squashing -> max pooling
       model:add(nn.SpatialConvolutionMap(nn.tables.random(16, 256, 4), 5, 5))
       model:add(nn.Tanh())

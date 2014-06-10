@@ -15,6 +15,7 @@ require 'Adagrad'
 require 'SpatialDeconvolution'
 require 'KLDCriterion'
 require 'BCECriterion'
+require 'SpatialZeroPaddingC'
 
 ------------------------------------------------------------
 -- deconvolutional network
@@ -24,18 +25,22 @@ require 'BCECriterion'
 
 local filter_size = 5
 local stride = 5
-local dim_hidden = 50
-local input_size = 30
-local total_size = 3 * input_size ^ 2
+local dim_hidden = 25
+local input_size = 32 --NB this is done later (line 129)
+local pad = 2
+local input_size_padded = input_size + 2 * pad
+local total_output_size = 3 * input_size ^ 2
+local feature_maps = 10
 
 -- NOT GENERIC 
-local map_size = (input_size / stride) ^ 2
-local feature_maps = 10
+local map_size = 16 ^2
+local factor = input_size/ 16
 
 local batchSize = 100
 local learningRate = 0.05
 
 local encoder = nn.Sequential()
+encoder:add(nn.SpatialZeroPaddingC(pad,pad,pad,pad))
 encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
 encoder:add(nn.Reshape(feature_maps * map_size))
@@ -46,15 +51,18 @@ z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
 
 encoder:add(z)
 
-decoder = nn.Sequential()
+local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,0))
 decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
-decoder:add(nn.SpatialDeconvolution(feature_maps,3,stride))
+decoder:add(nn.SpatialDeconvolution(feature_maps,3,factor))
 decoder:add(nn.Sigmoid())
-decoder:add(nn.Reshape(batchSize,total_size))
+print(batchSize)
+print(total_output_size)
+io.read()
+decoder:add(nn.Reshape(batchSize,total_output_size))
 
-model = nn.Sequential()
+local model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
@@ -70,10 +78,10 @@ end
 
 opfunc = function(batch) 
     model:zeroGradParameters()
-
     local f = model:forward(batch)
-
-    local target = batch:reshape(100,total_size)
+    print(f:size())
+    io.read()
+    local target = batch:reshape(100,total_output_size)
     local err = BCE:forward(f, target)
     local df_dw = BCE:backward(f, target)
 
@@ -121,14 +129,14 @@ testData.labels = testData.labels + 1
 
 -- reshape data
 trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
-trainData.data = trainData.data[{{},{},{2,31},{2,31}}]
+--trainData.data = trainData.data[{{},{},{2,31},{2,31}}]
 testData.data = testData.data:div(255):reshape(tesize,3,32,32)
-testData.data = testData.data[{{},{},{2,31},{2,31}}]
+--testData.data = testData.data[{{},{},{2,31},{2,31}}]
 
 
 epoch = 0
 
-adaGradInitRounds = 5
+adaGradInitRounds = 2
 h = adaGradInit(trainData.data, opfunc, batchSize, adaGradInitRounds)
 lowerboundlist = {}
 
