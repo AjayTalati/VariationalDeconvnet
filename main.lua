@@ -17,61 +17,20 @@ require 'KLDCriterion'
 require 'BCECriterion'
 require 'SpatialZeroPaddingC'
 
+require 'load'
+
 ------------------------------------------------------------
 -- deconvolutional network
 ------------------------------------------------------------
 -- torch.setnumthreads(2)
 -- print('<torch> set nb of threads to ' .. torch.getnumthreads())
 
-local filter_size = 5
-local stride = 2
-local dim_hidden = 25
-local input_size = 32 --NB this is done later (line 129)
-local pad1 = 1 --NB new size must be divisible with filtersize
-local pad2 = 2
-local total_output_size = 3 * input_size ^ 2
-local feature_maps = 10
-
--- NOT GENERIC 
-local map_size = 16 ^2
-local factor = input_size/ 16
-
-local batchSize = 100
-local learningRate = 0.05
-
-local encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
-encoder:add(nn.Threshold(0,0))
-encoder:add(nn.Reshape(feature_maps * map_size))
-
-local z = nn.ConcatTable()
-z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
-z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
-
-encoder:add(z)
-
-local decoder = nn.Sequential()
-decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
-decoder:add(nn.Threshold(0,0))
-decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
-decoder:add(nn.SpatialDeconvolution(feature_maps,3,factor))
-decoder:add(nn.Sigmoid())
-decoder:add(nn.Reshape(batchSize,total_output_size))
-
-local model = nn.Sequential()
-model:add(encoder)
-model:add(nn.Reparametrize(dim_hidden))
-model:add(decoder)
+require 'config/1-layer-nopadding'
 
 torch.save('params/model',model)
 
 BCE = nn.BCECriterion()
 KLD = nn.KLDCriterion()
-
-function display(input, reconstruction)
-  gfx.image({input:reshape(3,32,32), reconstruction:reshape(3,32,32)}, {zoom=9, legends={'Input', 'Reconstruction'}})
-end
 
 opfunc = function(batch) 
     model:zeroGradParameters()
@@ -93,41 +52,10 @@ opfunc = function(batch)
     return weights, grads, lowerbound
 end
 
-local trsize = 50000
-local tesize = 10000
+trsize = 50000
+tesize = 10000
 
-
--- load dataset
-local trainData = {
-   data = torch.Tensor(trsize, 3072),
-   labels = torch.Tensor(trsize),
-   size = function() return trsize end
-}
-
-for i = 0,4 do
-  subset = torch.load('cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
-  trainData.data[{ {i*10000+1, (i+1)*10000} }] = subset.data:t()
-  trainData.labels[{ {i*10000+1, (i+1)*10000} }] = subset.labels
-end
-
--- trainData.data = trainData.data:double()
-
-trainData.labels = trainData.labels + 1
-
-subset = torch.load('cifar-10-batches-t7/test_batch.t7', 'ascii')
-local testData = {
-   data = subset.data:t():double(),
-   labels = subset.labels[1]:double(),
-   size = function() return tesize end
-}
-testData.labels = testData.labels + 1
-
--- reshape data
-trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
---trainData.data = trainData.data[{{},{},{2,31},{2,31}}]
-testData.data = testData.data:div(255):reshape(tesize,3,32,32)
---testData.data = testData.data[{{},{},{2,31},{2,31}}]
-
+trainData, testData = loadCifar(trsize,tesize)
 
 epoch = 0
 
