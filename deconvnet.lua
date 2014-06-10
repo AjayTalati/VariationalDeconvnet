@@ -24,11 +24,11 @@ require 'SpatialZeroPaddingC'
 -- print('<torch> set nb of threads to ' .. torch.getnumthreads())
 
 local filter_size = 5
-local stride = 5
+local stride = 2
 local dim_hidden = 25
 local input_size = 32 --NB this is done later (line 129)
-local pad = 2
-local input_size_padded = input_size + 2 * pad
+local pad1 = 1 --NB new size must be divisible with filtersize
+local pad2 = 2
 local total_output_size = 3 * input_size ^ 2
 local feature_maps = 10
 
@@ -40,7 +40,7 @@ local batchSize = 100
 local learningRate = 0.05
 
 local encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingC(pad,pad,pad,pad))
+encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
 encoder:add(nn.Reshape(feature_maps * map_size))
@@ -57,9 +57,6 @@ decoder:add(nn.Threshold(0,0))
 decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
 decoder:add(nn.SpatialDeconvolution(feature_maps,3,factor))
 decoder:add(nn.Sigmoid())
-print(batchSize)
-print(total_output_size)
-io.read()
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
 local model = nn.Sequential()
@@ -79,8 +76,6 @@ end
 opfunc = function(batch) 
     model:zeroGradParameters()
     local f = model:forward(batch)
-    print(f:size())
-    io.read()
     local target = batch:reshape(100,total_output_size)
     local err = BCE:forward(f, target)
     local df_dw = BCE:backward(f, target)

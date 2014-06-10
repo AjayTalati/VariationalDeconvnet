@@ -2,8 +2,6 @@ local BCECriterion, parent = torch.class('nn.BCECriterion', 'nn.Criterion')
 
 function BCECriterion:updateOutput(input, target)
     -- log(input) * target + log(1 - input) * (1 - target)
-    print(input:size())
-    print(target:size())
     self.output = torch.log(input):cmul(target)
     
     self.output:add(torch.add(-input,1):log():cmul(torch.add(-target,1)))

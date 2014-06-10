@@ -89,9 +89,7 @@ function SpatialZeroPaddingC:updateGradInput(input, gradOutput)
       if self.pad_l > 0 then cg_output = cg_output:narrow(4, 1 + self.pad_l, cg_output:size(4) - self.pad_l) end
       if self.pad_r > 0 then cg_output = cg_output:narrow(4, 1, cg_output:size(4) - self.pad_r) end
       -- copy gradOuput to gradInput
-      print(cg_input:size())
-      print(cg_output:size())
-      io.read()
+
       cg_input:copy(cg_output)
    else
       error('input must be 3 or 4-dimensional')
