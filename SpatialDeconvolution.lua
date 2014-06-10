@@ -18,6 +18,7 @@ end
 
 function SpatialDeconvolution:updateOutput(input)
   self.output:resize(input:size(1), self.weight:size(1))
+
   self.output:mm(input, self.weight:t())
 
    return self.output
