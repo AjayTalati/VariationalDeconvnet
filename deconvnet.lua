@@ -23,18 +23,18 @@ require 'SpatialZeroPaddingC'
 -- torch.setnumthreads(2)
 -- print('<torch> set nb of threads to ' .. torch.getnumthreads())
 
-local filter_size = 5
-local stride = 2
+local filter_size = 4
+local stride = 4
 local dim_hidden = 25
 local input_size = 32 --NB this is done later (line 129)
-local pad1 = 1 --NB new size must be divisible with filtersize
-local pad2 = 2
+local pad1 = 0 --NB new size must be divisible with filtersize
+local pad2 = 0
 local total_output_size = 3 * input_size ^ 2
-local feature_maps = 10
+local feature_maps = 5
 
 -- NOT GENERIC 
-local map_size = 16 ^2
-local factor = input_size/ 16
+local map_size = 8^2
+local factor = input_size/8
 
 local batchSize = 100
 local learningRate = 0.05
@@ -104,7 +104,7 @@ local trainData = {
    size = function() return trsize end
 }
 
-for i = 0,4 do
+for i = 0,0 do
   subset = torch.load('cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
   trainData.data[{ {i*10000+1, (i+1)*10000} }] = subset.data:t()
   trainData.labels[{ {i*10000+1, (i+1)*10000} }] = subset.labels
@@ -160,7 +160,7 @@ while true do
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
     table.insert(lowerboundlist, lowerbound/N)
 
-    if epoch % 2 == 0 and epoch ~= 0 then
+    if epoch % 5 == 0 and epoch ~= 0 then
         print("Saving weights...")
         weights, gradients = model:getParameters()
         torch.save('params/' .. epoch .. '_weights.t7', weights)
