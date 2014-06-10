@@ -53,45 +53,9 @@ opfunc = function(batch)
     return weights, grads, lowerbound
 end
 
-<<<<<<< HEAD:deconvnet.lua
-local trsize = 50000
-local tesize = 10000
 
-
--- load dataset
-local trainData = {
-   data = torch.Tensor(trsize, 3072),
-   labels = torch.Tensor(trsize),
-   size = function() return trsize end
-}
-
-for i = 0,0 do
-  subset = torch.load('cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
-  trainData.data[{ {i*10000+1, (i+1)*10000} }] = subset.data:t()
-  trainData.labels[{ {i*10000+1, (i+1)*10000} }] = subset.labels
-end
-
--- trainData.data = trainData.data:double()
-
-trainData.labels = trainData.labels + 1
-
-subset = torch.load('cifar-10-batches-t7/test_batch.t7', 'ascii')
-local testData = {
-   data = subset.data:t():double(),
-   labels = subset.labels[1]:double(),
-   size = function() return tesize end
-}
-testData.labels = testData.labels + 1
-
--- reshape data
-trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
---trainData.data = trainData.data[{{},{},{2,31},{2,31}}]
-testData.data = testData.data:div(255):reshape(tesize,3,32,32)
---testData.data = testData.data[{{},{},{2,31},{2,31}}]
-=======
 trsize = 50000
 tesize = 10000
->>>>>>> 6c34e17e1d736dc12615b8c4f9630853a0cb1a4d:main.lua
 
 trainData, testData = loadCifar(trsize,tesize)
 
