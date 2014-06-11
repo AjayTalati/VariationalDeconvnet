@@ -26,7 +26,7 @@ require 'load'
 -- print('<torch> set nb of threads to ' .. torch.getnumthreads())
 
 
-require 'config/1-layer'
+require 'config/2-layer-doublepadding-mnist'
 
 torch.save('params/model',model)
 
@@ -58,13 +58,12 @@ trsize = 50000
 tesize = 10000
 
 print('loading data...')
-trainData, testData = loadCifar(trsize,tesize,true)
+trainData, testData = loadMnist(trsize,tesize,true)
 print('done')
 
 epoch = 0
-io.read()
 
-adaGradInitRounds = 2
+adaGradInitRounds = 5
 h = adaGradInit(trainData.data, opfunc, batchSize, adaGradInitRounds)
 lowerboundlist = {}
 
@@ -96,8 +95,8 @@ while true do
     if epoch % 5 == 0 and epoch ~= 0 then
         print("Saving weights...")
         weights, gradients = model:getParameters()
-        torch.save('params/' .. epoch .. '_weights.t7', weights)
-        torch.save('params/' .. epoch .. '_adagrad.t7', h)
+        torch.save('params/weights.t7', weights)
+        torch.save('params/adagrad.t7', h)
         torch.save('params/lowerbound.t7', torch.Tensor(lowerboundlist))
     end
 end
