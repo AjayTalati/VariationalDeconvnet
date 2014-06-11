@@ -58,8 +58,9 @@ trsize = 50000
 tesize = 10000
 
 print('loading data...')
-trainData, testData = loadCifar(trsize,tesize)
+trainData, testData = loadCifar(trsize,tesize,true)
 print('done')
+
 epoch = 0
 io.read()
 

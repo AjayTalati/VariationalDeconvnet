@@ -1,7 +1,7 @@
 require 'paths'
 
 -- load dataset
-function loadCifar(trsize,tesize)
+function loadCifar(trsize,tesize,pad)
 	local trainData = {
 	   data = torch.Tensor(trsize, 3072),
 	   labels = torch.Tensor(trsize),
@@ -30,6 +30,16 @@ function loadCifar(trsize,tesize)
 	trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
 	testData.data = testData.data:div(255):reshape(tesize,3,32,32)
 
+	if pad then
+		padded_data = torch.zeros(trsize,3,36,36)
+		padded_data[{{},{},{3,34},{3,34}}] = trainData.data
+		trainData.data = padded_data
+
+		padded_data = torch.zeros(tesize,3,36,36)
+		padded_data[{{},{},{3,34},{3,34}}] = testData.data
+		testData.data = padded_data
+	end
+
 	return trainData,testData
 end
 
@@ -42,6 +52,7 @@ function loadMnist()
 	}
 	trainData.data = trainData.data:reshape(50000,1,28,28)
 	testData.data = testData.data:reshape(10000,1,28,28)
+
 	return trainData, testData
 end
 
@@ -69,10 +80,3 @@ function loadMnist_old()
    
 	return trainData, testData
 end
-
-
-
-
-
---trainData.data = trainData.data[{{},{},{2,31},{2,31}}]
---testData.data = testData.data[{{},{},{2,31},{2,31}}]
