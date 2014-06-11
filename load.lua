@@ -1,5 +1,5 @@
 -- load dataset
-function loadCifar(trsize,tesize)
+function loadCifar(trsize,tesize,pad)
 	local trainData = {
 	   data = torch.Tensor(trsize, 3072),
 	   labels = torch.Tensor(trsize),
@@ -7,7 +7,7 @@ function loadCifar(trsize,tesize)
 	}
 
 	for i = 0,4 do
-	  local subset = torch.load('cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
+	  local subset = torch.load('datasets/cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
 	  trainData.data[{ {i*10000+1, (i+1)*10000} }] = subset.data:t()
 	  trainData.labels[{ {i*10000+1, (i+1)*10000} }] = subset.labels
 	end
@@ -16,7 +16,7 @@ function loadCifar(trsize,tesize)
 
 	trainData.labels = trainData.labels + 1
 
-	local subset = torch.load('cifar-10-batches-t7/test_batch.t7', 'ascii')
+	local subset = torch.load('datasets/cifar-10-batches-t7/test_batch.t7', 'ascii')
 	local testData = {
 	   data = subset.data:t():double(),
 	   labels = subset.labels[1]:double(),
@@ -28,10 +28,19 @@ function loadCifar(trsize,tesize)
 	trainData.data = trainData.data:div(255):reshape(trsize,3,32,32)
 	testData.data = testData.data:div(255):reshape(tesize,3,32,32)
 
+
+	if pad then
+		padded_data = torch.zeros(trsize,3,36,36)
+		padded_data[{{},{},{3,34},{3,34}}] = trainData.data
+		trainData.data = padded_data
+
+		padded_data = torch.zeros(tesize,3,36,36)
+		padded_data[{{},{},{3,34},{3,34}}] = testData.data
+		testData.data = padded_data
+	end
+
 	return trainData,testData
 end
-
-
 
 --trainData.data = trainData.data[{{},{},{2,31},{2,31}}]
 --testData.data = testData.data[{{},{},{2,31},{2,31}}]

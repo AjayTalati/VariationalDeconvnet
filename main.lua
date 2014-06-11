@@ -57,7 +57,7 @@ end
 trsize = 50000
 tesize = 10000
 
-trainData, testData = loadCifar(trsize,tesize)
+trainData, testData = loadCifar(trsize,tesize,true)
 
 epoch = 0
 

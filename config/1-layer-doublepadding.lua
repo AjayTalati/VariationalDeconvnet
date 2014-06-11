@@ -16,7 +16,7 @@ map_size = 32^2
 --factor = input_size/ 16
 
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
+-- encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
 encoder:add(nn.Reshape(feature_maps * map_size))
