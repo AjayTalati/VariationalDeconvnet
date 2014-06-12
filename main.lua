@@ -29,7 +29,6 @@ cmd:option('-threads', 2, 'nb of threads to use')
 cmd:text()
 opt = cmd:parse(arg)
 
-
 if opt.seed then
     torch.manualSeed(1)
 end
@@ -69,7 +68,6 @@ function getLowerbound(data)
         local batch = data[{{i,iend},{}}]
 
         local f = model:forward(batch)
-        -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
         local target = batch:reshape(100,total_output_size)
         local err = BCE:forward(f, target)
 
@@ -86,6 +84,7 @@ end
 epoch = 0
 
 h = adaGradInit(trainData.data, opfunc, batchSize, initrounds)
+
 lowerboundlist = {}
 
 while true do
@@ -116,6 +115,7 @@ while true do
     if epoch % 2 == 0 and epoch ~= 0 then
         print("Saving weights...")
         weights, gradients = model:getParameters()
+
         torch.save(opt.save .. '/weights.t7', weights)
         torch.save(opt.save .. '/adagrad.t7', h)
         torch.save(opt.save .. '/lowerbound.t7', torch.Tensor(lowerboundlist))
