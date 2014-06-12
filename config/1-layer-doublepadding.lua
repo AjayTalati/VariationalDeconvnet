@@ -1,7 +1,3 @@
--- General parameters
-batchSize = 100
-learningRate = 0.05
-
 -- Model Specific parameters
 filter_size = 5
 stride = 1
@@ -16,7 +12,7 @@ map_size = 32^2
 --factor = input_size/ 16
 
 encoder = nn.Sequential()
--- encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(3,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
 encoder:add(nn.Reshape(feature_maps * map_size))
@@ -30,6 +26,7 @@ encoder:add(z)
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,0))
+-- decoder:add(nn.ReshapePad(batchSize,feature_maps,input_size,input_size))
 decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
 decoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolution(feature_maps,3,filter_size,filter_size,stride,stride))

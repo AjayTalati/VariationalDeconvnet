@@ -3,8 +3,8 @@ local SpatialDeconvolution, parent = torch.class('nn.SpatialDeconvolution', 'nn.
 function SpatialDeconvolution:__init(inputSize, outputSize,factor)
    parent.__init(self)
 
-   self.weight = torch.Tensor(outputSize*factor*factor, inputSize)
-   self.gradWeight = torch.Tensor(outputSize*factor*factor, inputSize)
+   self.weight = torch.Tensor(outputSize * factor * factor, inputSize)
+   self.gradWeight = torch.Tensor(outputSize * factor * factor, inputSize)
    self.factor = factor
    
    self:reset()

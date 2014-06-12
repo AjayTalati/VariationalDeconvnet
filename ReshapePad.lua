@@ -1,9 +1,9 @@
 local ReshapePad, parent = torch.class('nn.ReshapePad', 'nn.Module')
 
-function ReshapePad:__init(pad,...)
+function ReshapePad:__init(...)
    parent.__init(self)
    local arg = {...}
-   self.pad = pad
+   self.pad = 2
 
    self.size = torch.LongStorage()
    self.batchsize = torch.LongStorage()
@@ -29,8 +29,8 @@ function ReshapePad:updateOutput(input)
    local nelement = input:nElement()
    if nelement == self.nelement and input:size(1) ~= 1 then
       input:resize(self.size)
-      self.output = torch.zeros(self.size[1],self.size[2],self.size[3]+self.pad,self.size[4]+self.pad)
-      self.output[{{},{},{self.pad,self.size[3]-self.pad},{self.pad,self.size[4]-self.pad}}] = input
+      self.output = torch.zeros(self.size[1],self.size[2],self.size[3]+(2*self.pad),self.size[4]+(2*self.pad))
+      self.output[{{},{},{self.pad+1,self.size[3]+self.pad},{self.pad+1,self.size[4]+self.pad}}] = input
    else
       self.batchsize[1] = input:size(1)
 
@@ -39,11 +39,15 @@ function ReshapePad:updateOutput(input)
       self.output = torch.zeros(self.batchsize[1],self.batchsize[2],self.batchsize[3]+self.pad,self.batchsize[4]+self.pad)
       self.output[{{},{},{self.pad,self.batchsize[3]-self.pad},{self.pad,self.batchsize[4]-self.pad}}] = input
    end
+
+
    return self.output
 end
 
 function ReshapePad:updateGradInput(input, gradOutput)
    gradOutput = gradOutput:contiguous()
-   self.gradInput:set(gradOutput):resizeAs(input)
+   print(torch.norm(gradOutput))
+   size = input:size()
+   self.gradInput:set(gradOutput[{{},{},{self.pad+1,size[3]-self.pad},{self.pad+1,size[4]-self.pad}}]):resizeAs(input)
    return self.gradInput
 end

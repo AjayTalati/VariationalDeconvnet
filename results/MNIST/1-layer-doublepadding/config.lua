@@ -1,15 +1,19 @@
+batchSize = 100
+learningRate = 0.05
+initrounds = 5
+
 -- Model Specific parameters
 filter_size = 5
-stride = 2
+stride = 1
 dim_hidden = 25
 input_size = 32 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
+pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 total_output_size = 3 * input_size ^ 2
 feature_maps = 10
 
-map_size = 16 ^2
-factor = input_size/ 16
+map_size = 32^2
+--factor = input_size/ 16
 
 encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
@@ -26,8 +30,10 @@ encoder:add(z)
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,0))
-decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
-decoder:add(nn.SpatialDeconvolution(feature_maps,3,factor))
+-- decoder:add(nn.ReshapePad(batchSize,feature_maps,input_size,input_size))
+decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
+decoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
+decoder:add(nn.SpatialConvolution(feature_maps,3,filter_size,filter_size,stride,stride))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 

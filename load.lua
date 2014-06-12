@@ -6,7 +6,7 @@ function loadCifar(trsize,tesize,pad)
 	   size = function() return trsize end
 	}
 
-	for i = 0,4 do
+	for i = 0,math.ceil(trsize/10000)-1 do
 	  local subset = torch.load('datasets/cifar-10-batches-t7/data_batch_' .. (i+1) .. '.t7', 'ascii')
 	  trainData.data[{ {i*10000+1, (i+1)*10000} }] = subset.data:t()
 	  trainData.labels[{ {i*10000+1, (i+1)*10000} }] = subset.labels

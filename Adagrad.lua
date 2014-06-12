@@ -12,9 +12,9 @@ function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
                 h[j]:add(torch.cmul(grads[j],grads[j]))
             end
         end
+        collectgarbage()
     end
 
-    collectgarbage()
     return h
 end
 
