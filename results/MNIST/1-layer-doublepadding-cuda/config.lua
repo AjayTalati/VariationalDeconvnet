@@ -13,6 +13,9 @@ tesize = 10000 -- Size of test set
 -- trainData is table with field 'data' which contains the data
 trainData, testData = loadMnist(trsize,tesize)
 
+trainData.data = trainData.data:cuda()
+testData.data = testData.data:cuda()
+
 -- Model Specific parameters
 filter_size = 5
 stride = 1
@@ -30,13 +33,13 @@ encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(1,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
-encoder:add(nn.Reshape(feature_maps * map_size))
+--encoder:add(nn.Reshape(feature_maps * map_size))
 
 local z = nn.ConcatTable()
 z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
 z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
 
-encoder:add(z)
+--encoder:add(z)
 
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
@@ -47,13 +50,18 @@ decoder:add(nn.SpatialConvolution(feature_maps,1,filter_size,filter_size,stride,
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
+encoderwithz = nn.Sequential()
+encoderwithz:add(encoder)
+encoderwithz:add(nn.Copy('torch.CudaTensor', 'torch.DoubleTensor'))
+encoderwithz:add(nn.Reshape(feature_maps * map_size))
+encoderwithz:add(z)
+
 model = nn.Sequential()
-model:add(encoder)
-model:add(nn.Copy('torch.CudaTensor', 'torch.DoubleTensor'))
-model:add(z)
+model:add(encoderwithz)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(nn.Copy('torch.DoubleTensor', 'torch.CudaTensor'))
 model:add(decoder)
+model:add(nn.Copy('torch.CudaTensor', 'torch.DoubleTensor'))
 
 encoder:cuda()
 decoder:cuda()
