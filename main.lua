@@ -35,6 +35,7 @@ end
 require (opt.save .. '/config')
 
 BCE = nn.BCECriterion()
+BCE.sizeAverage = false
 KLD = nn.KLDCriterion()
 
 opfunc = function(batch) 
@@ -61,8 +62,8 @@ end
 function getLowerbound(data)
     local lowerbound = 0
      for i = 1, data:size(1), batchSize do
-        local iend = math.min(N,i+batchSize-1)
-        xlua.progress(iend, N)
+        local iend = math.min(data:size(1),i+batchSize-1)
+        xlua.progress(iend, data:size(1))
 
         local batch = data[{{i,iend},{}}]
 
