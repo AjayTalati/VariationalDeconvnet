@@ -6,6 +6,7 @@ function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
         local weights, grads, lowerbound = opfunc(batch)
 
         for j=1,#grads do
+		grads[j] = grads[j]:double()
             if h[j] == nil then
                 h[j] = torch.cmul(grads[j],grads[j]):add(0.01)
             else

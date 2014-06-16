@@ -23,7 +23,6 @@ cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments
 -- cmd:option('-network', '', 'reload pretrained network')
 
 cmd:option('-seed', true, 'fixed input seed for repeatable experiments')
---Does not work on OS X, WHY O WHY?
 cmd:option('-threads', 2, 'nb of threads to use')
 cmd:text()
 opt = cmd:parse(arg)
@@ -42,7 +41,7 @@ opfunc = function(batch)
     model:zeroGradParameters()
     local f = model:forward(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
-    local target = batch:reshape(100,total_output_size)
+    local target = batch:double():reshape(100,total_output_size)
     local err = BCE:forward(f, target)
     local df_dw = BCE:backward(f, target)
 
@@ -50,11 +49,11 @@ opfunc = function(batch)
 
     local KLDerr = KLD:forward(model:get(1).output, target)
     local dKLD_dw = KLD:backward(model:get(1).output, target)
-    encoder:backward(batch,dKLD_dw)
+
+    encoderwithz:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
     local weights, grads = model:parameters()
-
 
     return weights, grads, lowerbound
 end
@@ -100,6 +99,7 @@ while true do
 
         local k = 1
         for j = i,iend do
+		print(batch[k]:size())
             batch[k] = trainData.data[shuffle[j]]:clone() 
             k = k + 1
         end
