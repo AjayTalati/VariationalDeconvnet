@@ -13,14 +13,15 @@ gfx = require 'gfx.js'
 
 ------------------------------------------------------------------------------------------------------------
 
-require 'params/config'
-fname_weights = 'params/100_weights.t7'
+foldername = 'results/MNIST/test_folder'
+require foldername .. '/config'
+
  
 ------------------------------------------------------------------------------------------------------------
 
-model = torch.load('params/model')
+model = torch.load(fname .. '/model')
 weights, gradients = model:getParameters()
-weights:copy(torch.load(fname_weights))
+weights:copy(torch.load(fname .. '/weights.t7'))
 features_layer1 = weights[{{1,feature_maps*colorchannels*map_size*map_size}}]:reshape(feature_maps,colorchannels,filtersize,filtersize)
 
 features_layer1 = {}
@@ -30,10 +31,16 @@ end
 gfx.image(features_layer1,zoom=20)
 
 trainData, testData = loadMnist(trsize,tesize)
-print(testData.data:size())
 data = testData.data[{{1,100},{},{},{}}]
 
 
 function display(reconstruction, input)
-  gfx.image({input:reshape(colorchannels,28,28), reconstruction:reshape(1,28,28)}, {zoom=9, legends={'Input', 'Reconstruction'}})
+  gfx.image({input:reshape(colorchannels,input_size,input_size), reconstruction:reshape(colorchannels,input_size,input_size)}, {zoom=9, legends={'Input', 'Reconstruction'}})
+end
+
+function plot_lowerbound() -- add testlowerbound later
+	lowerbound = torch.load(foldername .. 'lowerbound.t7')
+	lowerbound_test = torch.load(foldername .. 'lowerbound_test.t7')	
+	gfx.chart(lowerbound,{chart='line'})
+	gfx.chart(lowerbound_test, {chart='line'})
 end

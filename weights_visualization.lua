@@ -1,29 +1,29 @@
 require 'image'
 
 gfx = require 'gfx.js'
+--th -lgfx.go
 
-inputsize = 32
-colorchannels = 3
-featuremaps = 10
+inputsize = 28
+colorchannels = 1
+featuremaps = 15
 filtersize = 4
-dimz = 25
+dim_hidden = 25
+stride = 2
+featuremapsize = 14
 
-featuremapsize = inputsize/filtersize
-
-weights_all = torch.load('params/100_weight.t7')
+weights_all = torch.load('params/100_weights.t7')
 
 -----------------------------------------------------------------------------------------
 max_filters_conv = featuremaps*colorchannels*filtersize*filtersize
 max_bias_conv = max_filters_conv + featuremaps
 
+max_mu_enc = max_bias_conv + dim_hidden * featuremaps * featuremapsize * featuremapsize
+max_bias_mu_enc  = max_mu_enc + dim_hidden
 
-max_mu_enc = max_bias_conv + dimz * featuremaps * featuremapsize * featuremapsize
-max_bias_mu_enc  = max_mu_enc + dimz
+max_sig_enc = max_bias_mu_enc + dim_hidden * featuremaps * featuremapsize * featuremapsize
+max_bias_sig_enc = max_sig_enc + dim_hidden
 
-max_sig_enc = max_bias_mu_enc + dimz * featuremaps * featuremapsize * featuremapsize
-max_bias_sig_enc = max_sig_enc + dimz
-
-max_fc_dec = max_bias_sig_enc + dimz * featuremaps * featuremapsize * featuremapsize
+max_fc_dec = max_bias_sig_enc + dim_hidden * featuremaps * featuremapsize * featuremapsize
 max_bias_fc_dec = max_fc_dec + featuremapsize * featuremapsize * featuremaps
 
 max_deconv = max_bias_fc_dec + colorchannels*filtersize*filtersize*featuremaps
@@ -37,4 +37,8 @@ weights_fc_dec = weights_all[{{max_bias_sig_enc+1,max_fc_dec}}]
 weights_deconv = weights_all[{{max_bias_fc_dec+1,weights_all:size(1)}}]
 
 convolutions = weights_conv:reshape(featuremaps,colorchannels,filtersize,filtersize)
-gfx.image(convolutions[{{1},{3}}],{zoom=40})
+features = {}
+for i=1,featuremaps do
+	table.insert(features,convolutions[{{i},{1},{},{}}]:squeeze())
+	gfx.image(features,{zoom=20, legends = {'','','','','','','','','','','','','','',''}})
+end

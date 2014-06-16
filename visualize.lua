@@ -11,6 +11,7 @@ gfx = require 'gfx.js'
 require 'LinearCR'
 require 'Reparametrize'
 require 'SpatialDeconvolution'
+require 'SpatialZeroPaddingC'
 
 
 ------------------------------------------------------------
@@ -29,9 +30,9 @@ epoch = 42
 model = torch.load('params/model')
 
 weights, gradients = model:getParameters()
-weights:copy(torch.load('params/' .. epoch .. '_weights.t7'))
+weights:copy(torch.load('params/100_weights.t7'))
 
-featuremaps = weights[{{1,30*3*4*4}}]:reshape(30,3,4,4)
+featuremaps = weights[{{1,15*1*5*5}}]:reshape(15,1,5,5)
 
 features = {}
 for i=1,30 do

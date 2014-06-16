@@ -1,6 +1,17 @@
--- General parameters
-batchSize = 100
-learningRate = 0.05
+---TEMPLATE CONFIG FILE
+
+---Required 
+batchSize = 100 -- size of mini-batches
+learningRate = 0.05 -- Learning rate used in AdaGrad
+
+initrounds = 5 -- Amount of intialization rounds in AdaGrad
+
+trsize = 50000 -- Size of training set
+tesize = 10000 -- Size of test set
+
+-- Loading data
+-- trainData is table with field 'data' which contains the data
+trainData, testData = loadMnist(trsize,tesize)
 
 -- Model Specific parameters
 filter_size = 5

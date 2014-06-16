@@ -5,7 +5,6 @@ require 'nn'
 
 require 'Adagrad'
 require 'KLDCriterion'
-require 'BCECriterion'
 
 require 'LinearCR'
 require 'Reparametrize'
@@ -61,7 +60,7 @@ end
 
 function getLowerbound(data)
     local lowerbound = 0
-     for i = 1, N, opt.batchSize do
+     for i = 1, data:size(1), batchSize do
         local iend = math.min(N,i+batchSize-1)
         xlua.progress(iend, N)
 
@@ -86,6 +85,7 @@ epoch = 0
 h = adaGradInit(trainData.data, opfunc, batchSize, initrounds)
 
 lowerboundlist = {}
+lowerbound_test_list = {}
 
 while true do
     epoch = epoch + 1
@@ -93,6 +93,7 @@ while true do
     local time = sys.clock()
     local shuffle = torch.randperm(trainData.data:size(1))
     local N = trainData.data:size(1)
+    local N_test = testData.data:size(1)
 
     for i = 1, N, batchSize do
         local iend = math.min(N,i+batchSize-1)
@@ -112,12 +113,18 @@ while true do
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
     table.insert(lowerboundlist, lowerbound/N)
 
-    if epoch % 2 == 0 and epoch ~= 0 then
+    if epoch % 5 == 0 then
+        print('Calculating test lowerbound')
+        lowerbound_test = getLowerbound(testData.data)
+        table.insert(lowerbound_test_list, lowerbound_test)
+        print('testlowerbound = ')
+        print(lowerbound_test/N_test)
         print("Saving weights...")
         weights, gradients = model:getParameters()
 
         torch.save(opt.save .. '/weights.t7', weights)
         torch.save(opt.save .. '/adagrad.t7', h)
         torch.save(opt.save .. '/lowerbound.t7', torch.Tensor(lowerboundlist))
+        torch.save(opt.save .. '/lowerbound_test.t7', torch.Tensor(lowerbound_test_list))
     end
 end
