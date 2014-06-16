@@ -24,6 +24,7 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
     local weights, grads, lowerbound = opfunc(batch)
 
     for i=1,#h do
+	grads[i] = grads[i]:double()
         h[i]:add(torch.cmul(grads[i],grads[i]))
 
         local prior = 0
