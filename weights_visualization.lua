@@ -17,14 +17,14 @@ weights_all = torch.load('params/100_weights.t7')
 max_filters_conv = featuremaps*colorchannels*filtersize*filtersize
 max_bias_conv = max_filters_conv + featuremaps
 
-max_mu_enc = max_bias_conv + dim_hidden * featuremaps * featuremapsize * featuremapsize
+max_mu_enc = max_bias_conv + dim_hidden * featuremaps * map_size
 max_bias_mu_enc  = max_mu_enc + dim_hidden
 
-max_sig_enc = max_bias_mu_enc + dim_hidden * featuremaps * featuremapsize * featuremapsize
+max_sig_enc = max_bias_mu_enc + dim_hidden * featuremaps * map_size
 max_bias_sig_enc = max_sig_enc + dim_hidden
 
-max_fc_dec = max_bias_sig_enc + dim_hidden * featuremaps * featuremapsize * featuremapsize
-max_bias_fc_dec = max_fc_dec + featuremapsize * featuremapsize * featuremaps
+max_fc_dec = max_bias_sig_enc + dim_hidden * featuremaps * map_size
+max_bias_fc_dec = max_fc_dec + map_size * featuremaps
 
 max_deconv = max_bias_fc_dec + colorchannels*filtersize*filtersize*featuremaps
 
