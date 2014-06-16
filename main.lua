@@ -95,11 +95,10 @@ while true do
         local iend = math.min(N,i+batchSize-1)
         xlua.progress(iend, N)
 
-        local batch = torch.Tensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+        local batch = torch.CudaTensor(iend-i+1,trainData.data:size(2),input_size,input_size)
 
         local k = 1
         for j = i,iend do
-		print(batch[k]:size())
             batch[k] = trainData.data[shuffle[j]]:clone() 
             k = k + 1
         end
