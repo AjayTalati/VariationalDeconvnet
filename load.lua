@@ -45,10 +45,10 @@ end
 
 function loadMnist()
 	local trainData = {
-	data = torch.load('mnist-t7/mnist_tr.t7') 
+	data = torch.load('datasets/mnist-t7/mnist_tr.t7') 
 	}
 	local testData = {
-	data = torch.load('mnist-t7/mnist_te.t7')
+	data = torch.load('datasets/mnist-t7/mnist_te.t7')
 	}
 	trainData.data = trainData.data:reshape(50000,1,28,28)
 	testData.data = testData.data:reshape(10000,1,28,28)

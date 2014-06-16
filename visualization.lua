@@ -13,34 +13,86 @@ gfx = require 'gfx.js'
 
 ------------------------------------------------------------------------------------------------------------
 
-foldername = 'results/MNIST/test_folder'
-require foldername .. '/config'
+fname = 'results/MNIST/1-layer'
+require (fname .. '/config')
 
  
 ------------------------------------------------------------------------------------------------------------
 
 model = torch.load(fname .. '/model')
-weights, gradients = model:getParameters()
-weights:copy(torch.load(fname .. '/weights.t7'))
-features_layer1 = weights[{{1,feature_maps*colorchannels*map_size*map_size}}]:reshape(feature_maps,colorchannels,filtersize,filtersize)
 
-features_layer1 = {}
-for i=1,feature_maps do
-	table.insert(features_layer1,featuremaps[{{i},{1},{},{}}]:squeeze())
-end
-gfx.image(features_layer1,zoom=20)
+
+--for i=1,feature_maps do
+--	table.insert(features_layer1,featuremaps[{{i},{1},{},{}}]:squeeze())
+--end
+--gfx.image(features_layer2,zoom=20)
 
 trainData, testData = loadMnist(trsize,tesize)
 data = testData.data[{{1,100},{},{},{}}]
+weights, gradients = model:getParameters()
 
+function display_reconstruction(input)	
+	local f = model:forward(input)
+	for i = 1,10 do
+		reconstruction = f[{{i},{}}]
+		target = input[{{i},{},{},{}}]
+		print('gfx')
+		gfx.image({target:reshape(colorchannels,input_size,input_size), reconstruction:reshape(colorchannels,input_size,input_size)}, {zoom=9, legends={'Target', 'Reconstruction'}})
+	end
+end
 
-function display(reconstruction, input)
-  gfx.image({input:reshape(colorchannels,input_size,input_size), reconstruction:reshape(colorchannels,input_size,input_size)}, {zoom=9, legends={'Input', 'Reconstruction'}})
+function display_weights(model, layers)
+	local features_layer1_table = {}
+	weights:copy(torch.load(fname .. '/weights.t7'))
+	local features_layer1 = weights[{{1,feature_maps*colorchannels*filter_size*filter_size}}]:reshape(feature_maps,colorchannels,filter_size,filter_size)
+	for i=1,feature_maps do
+		table.insert(features_layer1_table,features_layer1[{{i},{1},{},{}}]:squeeze())
+	end
+	gfx.image(features_layer1,{zoom=20})
 end
 
 function plot_lowerbound() -- add testlowerbound later
-	lowerbound = torch.load(foldername .. 'lowerbound.t7')
-	lowerbound_test = torch.load(foldername .. 'lowerbound_test.t7')	
-	gfx.chart(lowerbound,{chart='line'})
-	gfx.chart(lowerbound_test, {chart='line'})
+	lowerbound = torch.load(fname .. '/lowerbound.t7')
+	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
+	m = lowerbound:size(1)
+	mtest = lowerbound_test:size(1)
+	gfx.chart(lowerbound[{{5,m}}],{chart='line'})
+	gfx.chart(lowerbound_test[{{2,mtest}}], {chart='line'})
 end
+
+function plot_relevant_dims(weights)
+	--NB this only works for folder results/MNIST/1-layer
+	max_filters_conv = feature_maps*colorchannels*filter_size*filter_size
+	max_bias_conv = max_filters_conv + feature_maps
+
+	max_mu_enc = max_bias_conv + dim_hidden * feature_maps * map_size
+	max_bias_mu_enc  = max_mu_enc + dim_hidden
+
+	max_sig_enc = max_bias_mu_enc + dim_hidden * feature_maps * map_size
+	max_bias_sig_enc = max_sig_enc + dim_hidden
+
+	max_fc_dec = max_bias_sig_enc + dim_hidden * feature_maps * map_size
+	max_bias_fc_dec = max_fc_dec + map_size * feature_maps
+
+	max_deconv = max_bias_fc_dec + colorchannels*filter_size*filter_size*feature_maps
+
+	weights_conv = weights[{{1,max_filters_conv}}]
+	weights_mu_enc = weights[{{max_bias_conv+1,max_mu_enc}}]
+	weights_sig_enc = weights[{{max_bias_mu_enc+1,max_sig_enc}}]
+	weights_fc_dec = weights[{{max_bias_sig_enc+1,max_fc_dec}}]
+	weights_deconv = weights[{{max_bias_fc_dec+1,weights:size(1)}}]
+
+	weights_mu_enc = weights_mu_enc:reshape(feature_maps, 14, 14, dim_hidden)
+	weights_relevance = torch.Tensor(weights_mu_enc:size(4))
+
+	for i = 1,weights_mu_enc:size(4) do
+		weights_relevance[i] = torch.norm(weights_mu_enc[{{},{},{},{i}}])
+	end
+	gfx.chart(weights_relevance,{chart='line'})
+end
+
+
+display_reconstruction(data)
+display_weights(model,1)
+plot_relevant_dims(weights)
+plot_lowerbound()

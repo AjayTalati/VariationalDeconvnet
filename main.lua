@@ -66,7 +66,6 @@ function getLowerbound(data)
         xlua.progress(iend, data:size(1))
 
         local batch = data[{{i,iend},{}}]
-
         local f = model:forward(batch)
         local target = batch:reshape(100,total_output_size)
         local err = BCE:forward(f, target)
@@ -75,9 +74,6 @@ function getLowerbound(data)
 
         lowerbound = lowerbound + err + KLDerr
     end
-
-    lowerbound = lowerbound / data:size(1)
-
     return lowerbound
 end
 
@@ -123,6 +119,7 @@ while true do
         print("Saving weights...")
         weights, gradients = model:getParameters()
 
+        torch.save(opt.save .. '/model', model)
         torch.save(opt.save .. '/weights.t7', weights)
         torch.save(opt.save .. '/adagrad.t7', h)
         torch.save(opt.save .. '/lowerbound.t7', torch.Tensor(lowerboundlist))
