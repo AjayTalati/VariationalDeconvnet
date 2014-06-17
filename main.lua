@@ -41,16 +41,21 @@ opfunc = function(batch)
     model:zeroGradParameters()
     local f = model:forward(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
-    local target = batch:double():reshape(100,total_output_size)
+    local target = batch:double():reshape(batchSize,total_output_size)
     local err = BCE:forward(f, target)
     local df_dw = BCE:backward(f, target)
 
     model:backward(batch,df_dw)
 
-    local KLDerr = KLD:forward(model:get(1).output, target)
-    local dKLD_dw = KLD:backward(model:get(1).output, target)
+	local encoder_output = model:get(1).output
+	encoder_output[1] = encoder_output[1]:double()
+	encoder_output[2] = encoder_output[2]:double()
+    local KLDerr = KLD:forward(encoder_output, target)
+    local dKLD_dw = KLD:backward(encoder_output, target)
 
-    encoderwithz:backward(batch,dKLD_dw)
+	dKLD_dw[1] = dKLD_dw[1]:cuda()
+	dKLD_dw[2] = dKLD_dw[2]:cuda()
+    encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
     local weights, grads = model:parameters()
@@ -69,7 +74,10 @@ function getLowerbound(data)
         local target = batch:double():reshape(batchSize,total_output_size)
         local err = BCE:forward(f, target)
 
-        local KLDerr = KLD:forward(model:get(1).output, target)
+	local encoder_output = model:get(1).output
+	encoder_output[1] = encoder_output[1]:double()
+	encoder_output[2] = encoder_output[2]:double()
+        local KLDerr = KLD:forward(encoder_output, target)
 
         lowerbound = lowerbound + err + KLDerr
     end
