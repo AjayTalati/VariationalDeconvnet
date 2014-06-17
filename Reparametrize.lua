@@ -12,7 +12,13 @@ function Reparametrize:__init(dimension)
 end 
 
 function Reparametrize:updateOutput(input)
-    self.eps = torch.randn(input[2]:size(1),self.dimension)
+    if torch.typename(input[1]) == 'torch.CudaTensor' then
+        self.eps = torch.CudaTensor(input[2]:size(1),self.dimension)
+    else
+        self.eps = torch.Tensor(input[2]:size(1),self.dimension)
+    end
+
+    torch.randn(self.eps,input[2]:size(1),self.dimension)
     self.output = torch.mul(input[2],0.5):exp():cmul(self.eps)
 
     -- Add the mean_
