@@ -56,8 +56,11 @@ opfunc = function(batch)
     local KLDerr = KLD:forward(encoder_output, target)
     local dKLD_dw = KLD:backward(encoder_output, target)
 
-    dKLD_dw[1] = dKLD_dw[1]:cuda()
-    dKLD_dw[2] = dKLD_dw[2]:cuda()
+    if cuda then
+        dKLD_dw[1] = dKLD_dw[1]:cuda()
+        dKLD_dw[2] = dKLD_dw[2]:cuda()
+    end
+
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
@@ -110,7 +113,12 @@ while true do
         local iend = math.min(N,i+batchSize-1)
         xlua.progress(iend, N)
 
-        local batch = torch.CudaTensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+        local batch = torch.Tensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+
+        if cuda then
+            batch = torch.CudaTensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+        end
+
 
         local k = 1
         for j = i,iend do
