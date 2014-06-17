@@ -29,13 +29,17 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
 
         local prior = 0
         if i % 2 ~= 0 then
-            prior = -torch.mul(weights[i],0.5):mul(batchSize/N)
+            prior = -torch.mul(weights[i]:double(),0.5):mul(batchSize/N)
         end
 
         local update = torch.Tensor(h[i]:size()):fill(learningRate)
         update:cdiv(torch.sqrt(h[i])):cmul(torch.add(grads[i],prior))
 
-        weights[i]:add(update)
+	if torch.typename(weights[i]) == 'torch.CudaTensor' then
+		weights[i]:add(update:cuda())
+	else
+		weights[i]:add(update)
+	end
     end
 
     collectgarbage()

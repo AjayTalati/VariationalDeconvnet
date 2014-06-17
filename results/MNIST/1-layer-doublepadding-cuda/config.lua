@@ -2,9 +2,9 @@ require 'cutorch'
 require 'cunn'
 
 batchSize = 100 -- size of mini-batches
-learningRate = 0.05 -- Learning rate used in AdaGrad
+learningRate = 0.02 -- Learning rate used in AdaGrad
 
-initrounds = 5 -- Amount of intialization rounds in AdaGrad
+initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000 -- Size of training set
 tesize = 10000 -- Size of test set
