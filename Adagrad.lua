@@ -6,7 +6,8 @@ function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
         local weights, grads, lowerbound = opfunc(batch)
 
         for j=1,#grads do
-		grads[j] = grads[j]:double()
+            grads[j] = grads[j]:double()
+            
             if h[j] == nil then
                 h[j] = torch.cmul(grads[j],grads[j]):add(0.01)
             else
@@ -24,7 +25,7 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
     local weights, grads, lowerbound = opfunc(batch)
 
     for i=1,#h do
-	grads[i] = grads[i]:double()
+	   grads[i] = grads[i]:double()
         h[i]:add(torch.cmul(grads[i],grads[i]))
 
         local prior = 0
@@ -34,6 +35,12 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
 
         local update = torch.Tensor(h[i]:size()):fill(learningRate)
         update:cdiv(torch.sqrt(h[i])):cmul(torch.add(grads[i],prior))
+
+    	if torch.typename(weights[i]) == 'torch.CudaTensor' then
+    		weights[i]:add(update:cuda())
+    	else
+    		weights[i]:add(update)
+    	end
     end
 
     collectgarbage()
