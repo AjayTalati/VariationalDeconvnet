@@ -46,10 +46,13 @@ opfunc = function(batch)
     local df_dw = BCE:backward(f, target)
 
     model:backward(batch,df_dw)
+    local encoder_output = model:get(1).output
 
-	local encoder_output = model:get(1).output
-	encoder_output[1] = encoder_output[1]:double()
-	encoder_output[2] = encoder_output[2]:double()
+    if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
+	   encoder_output[1] = encoder_output[1]:double()
+	   encoder_output[2] = encoder_output[2]:double()
+    end
+
     local KLDerr = KLD:forward(encoder_output, target)
     local dKLD_dw = KLD:backward(encoder_output, target)
 
@@ -74,9 +77,13 @@ function getLowerbound(data)
         local target = batch:double():reshape(batchSize,total_output_size)
         local err = BCE:forward(f, target)
 
-	local encoder_output = model:get(1).output
-	encoder_output[1] = encoder_output[1]:double()
-	encoder_output[2] = encoder_output[2]:double()
+        local encoder_output = model:get(1).output
+        
+	    if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
+            encoder_output[1] = encoder_output[1]:double()
+            encoder_output[2] = encoder_output[2]:double()
+        end
+
         local KLDerr = KLD:forward(encoder_output, target)
 
         lowerbound = lowerbound + err + KLDerr

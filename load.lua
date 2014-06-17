@@ -45,41 +45,18 @@ end
 
 function loadMnist(trsize,tesize)
 	data = torch.load('datasets/mnist-t7/mnist_tr.t7') 
+
 	local trainData = {
-	data = data[{{1,trsize},{}}]
+		data = data[{{1,trsize},{}}]
 	}
 
 	data = torch.load('datasets/mnist-t7/mnist_te.t7')
+
 	local testData = {
-	data = data[{{1,tesize},{}}]
+		data = data[{{1,tesize},{}}]
 	}
 	trainData.data = trainData.data:reshape(trsize,1,28,28)
 	testData.data = testData.data:reshape(tesize,1,28,28)
 
-	return trainData, testData
-end
-
-function loadMnist_old()
-
-
-	path_train = 'mnist-th7/train.th7'
-	path_test = 'mnist-th7/test.th7'
-
-	local f = torch.DiskFile(path_train, 'r')
-	f:binary()
-	local nExample = f:readInt()
-    local dim = f:readInt()
-    local tensor = torch.Tensor(nExample, dim)
-    tensor:storage():copy(f:readFloat(nExample*dim))
-    trainData = {
-	data = tensor[{{1,50000},{1,784}}],
-	labels = tensor[{{1,50000},{785}}]}
-	testData = {
-	data = tensor[{{50001,60000},{1,784}}],
-	labels = tensor[{{50001,60000},{785}}]}
-
-	trainData.data = trainData.data:div(255):reshape(trsize,28,28)
-	testData.data = testData.data:div(255):reshape(tesize,28,28)
-   
 	return trainData, testData
 end
