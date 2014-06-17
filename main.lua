@@ -49,15 +49,15 @@ opfunc = function(batch)
     local encoder_output = model:get(1).output
 
     if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
-	   encoder_output[1] = encoder_output[1]:double()
-	   encoder_output[2] = encoder_output[2]:double()
+       encoder_output[1] = encoder_output[1]:double()
+       encoder_output[2] = encoder_output[2]:double()
     end
 
     local KLDerr = KLD:forward(encoder_output, target)
     local dKLD_dw = KLD:backward(encoder_output, target)
 
-	dKLD_dw[1] = dKLD_dw[1]:cuda()
-	dKLD_dw[2] = dKLD_dw[2]:cuda()
+    dKLD_dw[1] = dKLD_dw[1]:cuda()
+    dKLD_dw[2] = dKLD_dw[2]:cuda()
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
@@ -79,7 +79,7 @@ function getLowerbound(data)
 
         local encoder_output = model:get(1).output
         
-	    if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
+        if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
             encoder_output[1] = encoder_output[1]:double()
             encoder_output[2] = encoder_output[2]:double()
         end
@@ -124,14 +124,14 @@ while true do
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
     table.insert(lowerboundlist, lowerbound/N)
 
-    if epoch % 2 == 0 then
+    if epoch % 5 == 0 then
         print('Calculating test lowerbound\n')
         lowerbound_test = getLowerbound(testData.data)
         table.insert(lowerbound_test_list, lowerbound_test)
         print('testlowerbound = ')
         print(lowerbound_test/N_test)
         print("Saving weights...")
-        weights, gradients = model:parameters()
+        weights, gradients = model:getParameters()
 
         torch.save(opt.save .. '/model', model)
         torch.save(opt.save .. '/weights.t7', weights)

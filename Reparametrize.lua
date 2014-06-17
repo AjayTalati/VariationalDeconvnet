@@ -15,7 +15,7 @@ function Reparametrize:updateOutput(input)
 
     if torch.typename(input[1]) == 'torch.CudaTensor' then
         self.eps = self.eps:cuda()
-	    self.output = torch.CudaTensor():resizeAs(input[2]):fill(0.5)
+        self.output = torch.CudaTensor():resizeAs(input[2]):fill(0.5)
     else
         self.output = torch.Tensor():resizeAs(input[2]):fill(0.5)
     end
@@ -34,7 +34,7 @@ function Reparametrize:updateGradInput(input, gradOutput)
     
     --test gradient with Jacobian
     if torch.typename(input[1]) == 'torch.CudaTensor' then
-	    self.gradInput[2] = torch.CudaTensor():resizeAs(input[2]):fill(0.5)
+        self.gradInput[2] = torch.CudaTensor():resizeAs(input[2]):fill(0.5)
     else
         self.gradInput[2] = torch.Tensor():resizeAs(input[2]):fill(0.5)
     end
