@@ -1,7 +1,7 @@
 require 'cutorch'
 require 'cunn'
 
-batchSize = 100 -- size of mini-batches
+batchSize = 80 -- size of mini-batches
 learningRate = 0.02 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
@@ -31,8 +31,10 @@ map_size = 28^2
 
 encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolution(1,feature_maps,filter_size,filter_size,stride,stride))
-encoder:add(nn.Threshold(0,0))
+encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+encoder:add(nn.SpatialConvolutionCUDA(1,feature_maps,filter_size,filter_size,stride,stride))
+encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+encoder:add(nn.Threshold(0,1e-6))
 --encoder:add(nn.Reshape(feature_maps * map_size))
 
 local z = nn.ConcatTable()
@@ -43,10 +45,12 @@ z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
 
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
-decoder:add(nn.Threshold(0,0))
+decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
 decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
-decoder:add(nn.SpatialConvolution(feature_maps,1,filter_size,filter_size,stride,stride))
+decoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+decoder:add(nn.SpatialConvolutionCUDA(feature_maps,1,filter_size,filter_size,stride,stride))
+decoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
