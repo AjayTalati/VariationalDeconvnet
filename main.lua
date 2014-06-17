@@ -66,7 +66,7 @@ function getLowerbound(data)
 
         local batch = data[{{i,iend},{}}]
         local f = model:forward(batch)
-        local target = batch:double():reshape(100,total_output_size)
+        local target = batch:double():reshape(batchSize,total_output_size)
         local err = BCE:forward(f, target)
 
         local KLDerr = KLD:forward(model:get(1).output, target)
@@ -109,14 +109,14 @@ while true do
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
     table.insert(lowerboundlist, lowerbound/N)
 
-    if epoch % 5 == 0 then
-        print('Calculating test lowerbound')
+    if epoch % 2 == 0 then
+        print('Calculating test lowerbound\n')
         lowerbound_test = getLowerbound(testData.data)
         table.insert(lowerbound_test_list, lowerbound_test)
         print('testlowerbound = ')
         print(lowerbound_test/N_test)
         print("Saving weights...")
-        weights, gradients = model:getParameters()
+        weights, gradients = model:parameters()
 
         torch.save(opt.save .. '/model', model)
         torch.save(opt.save .. '/weights.t7', weights)
