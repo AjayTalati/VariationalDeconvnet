@@ -66,7 +66,7 @@ function getLowerbound(data)
 
         local batch = data[{{i,iend},{}}]
         local f = model:forward(batch)
-        local target = batch:reshape(100,total_output_size)
+        local target = batch:double():reshape(100,total_output_size)
         local err = BCE:forward(f, target)
 
         local KLDerr = KLD:forward(model:get(1).output, target)
