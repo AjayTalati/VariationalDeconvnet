@@ -13,7 +13,7 @@ gfx = require 'gfx.js'
 
 ------------------------------------------------------------------------------------------------------------
 
-fname = 'results/MNIST/1-layer'
+fname = 'results/MNIST/2-layer'
 require (fname .. '/config')
 
  
@@ -21,22 +21,16 @@ require (fname .. '/config')
 
 model = torch.load(fname .. '/model')
 
-
---for i=1,feature_maps do
---	table.insert(features_layer1,featuremaps[{{i},{1},{},{}}]:squeeze())
---end
---gfx.image(features_layer2,zoom=20)
-
 trainData, testData = loadMnist(trsize,tesize)
 data = testData.data[{{1,100},{},{},{}}]
 weights, gradients = model:getParameters()
 
 function display_reconstruction(input)	
-	local f = model:forward(input)
-	for i = 1,10 do
+	f = model:forward(input)
+	print('hoi')
+		for i = 1,10 do
 		reconstruction = f[{{i},{}}]
 		target = input[{{i},{},{},{}}]
-		print('gfx')
 		gfx.image({target:reshape(colorchannels,input_size,input_size), reconstruction:reshape(colorchannels,input_size,input_size)}, {zoom=9, legends={'Target', 'Reconstruction'}})
 	end
 end
@@ -54,14 +48,18 @@ end
 function plot_lowerbound() -- add testlowerbound later
 	lowerbound = torch.load(fname .. '/lowerbound.t7')
 	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
-	m = lowerbound:size(1)
-	mtest = lowerbound_test:size(1)
-	gfx.chart(lowerbound[{{5,m}}],{chart='line'})
-	gfx.chart(lowerbound_test[{{2,mtest}}], {chart='line'})
+	values = 	  torch.Tensor(lowerbound:size(1)	 -4,2)
+	values_test = torch.Tensor(lowerbound_test:size(1)-1,2)
+	values[{{},{2}}] 	  = lowerbound[{{5,lowerbound:size(1)}}]
+	values_test[{{},{2}}] = lowerbound_test[{{2,lowerbound_test:size(1)}}]
+	values[{{},{1}}] 	  = torch.linspace(0,50000*lowerbound:size(1)-4,lowerbound:size(1)-4)
+	values_test[{{},{1}}] = torch.linspace(0,250000*lowerbound_test:size(1)-1,lowerbound_test:size(1)-1)
+
+	gfx.chart({ values, values_test },{chart = 'line'})
 end
 
 function plot_relevant_dims(weights)
-	--NB this only works for folder results/MNIST/1-layer
+	--NB this only works for folder results/MNIST/1-layer, need to make generic for all that use SpatialDeconvolution
 	max_filters_conv = feature_maps*colorchannels*filter_size*filter_size
 	max_bias_conv = max_filters_conv + feature_maps
 
@@ -94,5 +92,5 @@ end
 
 display_reconstruction(data)
 display_weights(model,1)
-plot_relevant_dims(weights)
+--plot_relevant_dims(weights)
 plot_lowerbound()

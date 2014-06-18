@@ -31,6 +31,7 @@ map_size = 14
 map_size_2 = 7
 factor = input_size/map_size
 factor_2 = map_size/map_size_2
+colorchannels = 1
 
 --layer1
 encoder = nn.Sequential()

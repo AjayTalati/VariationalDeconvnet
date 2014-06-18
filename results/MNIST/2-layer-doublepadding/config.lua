@@ -20,7 +20,7 @@ pad1 = 1 --NB new size must be divisible with filtersize
 pad2 = 2
 pad_2 = (filter_size_2-1)/2
 total_output_size = 1 * input_size ^ 2
-feature_maps = 15
+feature_maps = 16
 feature_maps_2 = feature_maps*2
 
 map_size = 14

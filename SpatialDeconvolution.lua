@@ -1,7 +1,7 @@
 local SpatialDeconvolution, parent = torch.class('nn.SpatialDeconvolution', 'nn.Module')
 
 function SpatialDeconvolution:__init(inputSize, outputSize,factor)
-   parent.__init(self)
+    parent.__init(self)
 
    self.weight = torch.Tensor(outputSize * factor * factor, inputSize)
    self.gradWeight = torch.Tensor(outputSize * factor * factor, inputSize)
@@ -17,20 +17,34 @@ end
 
 
 function SpatialDeconvolution:updateOutput(input)
-  self.output:resize(input:size(1), self.weight:size(1))
+    if torch.typename(input) == 'torch.CudaTensor' then
+        self.output = torch.CudaTensor()
+    else
+        self.output = torch.Tensor()
+    end
 
-  self.output:mm(input, self.weight:t())
+    self.output:resize(input:size(1), self.weight:size(1)):fill(0)
+
+    self.output:addmm(input, self.weight:t())
 
    return self.output
 end
 
 function SpatialDeconvolution:updateGradInput(input, gradOutput)
-  self.gradInput = torch.mm(gradOutput, self.weight)
-  return self.gradInput
+    if torch.typename(input) == 'torch.CudaTensor' then
+        self.gradInput = torch.CudaTensor()
+    else
+        self.gradInput = torch.Tensor()
+    end
+
+    self.gradInput:resize(gradOutput:size(1), self.weight:size(2)):fill(0)
+    self.gradInput:addmm(gradOutput, self.weight)
+    
+    return self.gradInput
 end
 
 function SpatialDeconvolution:accGradParameters(input, gradOutput, scale)
-   local scale = scale or 1
-   self.gradWeight:addmm(scale, gradOutput:t(), input)
-   return self.gradWeight
+    local scale = scale or 1
+    self.gradWeight:addmm(scale, gradOutput:t(), input)
+    return self.gradWeight
 end
