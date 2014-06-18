@@ -23,9 +23,10 @@ function SpatialDeconvolution:updateOutput(input)
     self.output = torch.Tensor()
   end
 
-  self.output:resize(input:size(1), self.weight:size(1))
 
-  self.output:mm(input, self.weight:t())
+  self.output:resize(input:size(1), self.weight:size(1)):fill(0)
+
+  self.output:addmm(input, self.weight:t())
 
    return self.output
 end
@@ -37,7 +38,10 @@ function SpatialDeconvolution:updateGradInput(input, gradOutput)
     self.gradInput = torch.Tensor()
   end
 
-  self.gradInput:mm(gradOutput, self.weight)
+
+  self.gradInput:resize(gradOutput:size(1), self.weight:size(2)):fill(0)
+
+  self.gradInput:addmm(gradOutput, self.weight)
   
   return self.gradInput
 end

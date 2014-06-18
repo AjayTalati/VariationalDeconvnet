@@ -4,7 +4,7 @@ require 'cunn'
 cuda = true
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.05 -- Learning rate used in AdaGrad
+learningRate = 0.02 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -70,15 +70,15 @@ decoder:add(nn.SpatialConvolutionCUDA(feature_maps_2,feature_maps,filter_size_2,
 decoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 --layer1
 decoder:add(nn.Reshape((map_size^2)*batchSize,feature_maps))
+decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
+decoder:add(nn.Sigmoid())
+decoder:add(nn.Reshape(batchSize,total_output_size))
 
 model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
 model:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
-model:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
-model:add(nn.Sigmoid())
-model:add(nn.Reshape(batchSize,total_output_size))
 
 encoder:cuda()
 decoder:cuda()
