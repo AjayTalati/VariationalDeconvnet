@@ -1,5 +1,6 @@
 require 'cutorch'
 require 'cunn'
+require 'SpatialZeroPaddingCUDA'
 
 cuda = true
 
@@ -42,12 +43,10 @@ encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
 encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
-encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 encoder:add(nn.Threshold(0,1e-6))
 --layer2
 --Refactor SZP to use dim 3 and 4 so no need for double transpose
-encoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2)) 
-encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+encoder:add(nn.SpatialZeroPaddingCUDA(pad_2,pad_2,pad_2,pad_2)) 
 encoder:add(nn.SpatialConvolutionCUDA(feature_maps,feature_maps_2,filter_size_2,filter_size_2,1,1))
 encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 encoder:add(nn.Threshold(0,1e-6))

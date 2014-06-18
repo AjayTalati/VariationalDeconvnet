@@ -13,7 +13,7 @@ function SpatialZeroPaddingCUDA:updateOutput(input)
    local h = input:size(2) + self.pad_t + self.pad_b
    local w = input:size(3) + self.pad_l + self.pad_r
    if w < 1 or h < 1 then error('input is too small') end
-   self.output:resize(input:size(1), h, w)
+   self.output:resize(input:size(1), h, w, input:size(4))
    self.output:zero()
    -- crop input if necessary
    local c_input = input
