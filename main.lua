@@ -23,7 +23,6 @@ cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments
 cmd:option('-continue', false, 'load parameters from earlier training')
 cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
 
-cmd:option('-threads', 2, 'nb of threads to use')
 
 cmd:text()
 opt = cmd:parse(arg)
