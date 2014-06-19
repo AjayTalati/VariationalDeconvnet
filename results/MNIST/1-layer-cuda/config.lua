@@ -54,11 +54,9 @@ decoder:add(nn.Reshape(batchSize,total_output_size))
 
 model = nn.Sequential()
 model:add(encoder)
-model:add(nn.Copy('torch.CudaTensor', 'torch.DoubleTensor'))
-model:add(z)
 model:add(nn.Reparametrize(dim_hidden))
-model:add(nn.Copy('torch.DoubleTensor', 'torch.CudaTensor'))
 model:add(decoder)
+model:add(nn.Copy('torch.CudaTensor', 'torch.DoubleTensor'))
 
 encoder:cuda()
 decoder:cuda()
