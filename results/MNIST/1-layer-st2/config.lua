@@ -1,13 +1,13 @@
 ---TEMPLATE CONFIG FILE
 
 ---Required 
-batchSize = 100 -- size of mini-batches
-learningRate = 0.05 -- Learning rate used in AdaGrad
+batchSize = 128 -- size of mini-batches
+learningRate = 0.03 -- Learning rate used in AdaGrad
 
-initrounds = 5 -- Amount of intialization rounds in AdaGrad
+initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
-trsize = 50000 -- Size of training set
-tesize = 10000 -- Size of test set
+trsize = 50000-80 -- Size of training set
+tesize = 10000-16 -- Size of test set
 
 -- Loading data
 -- trainData is table with field 'data' which contains the data
@@ -22,7 +22,7 @@ pad1 = 1 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
-feature_maps = 15
+feature_maps = 16
 
 map_size = 14^2
 factor = input_size/14
@@ -32,8 +32,6 @@ encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
-
-
 
 encoder:add(nn.Reshape(feature_maps * map_size))
 
@@ -47,10 +45,12 @@ local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,0))
 
-
+decoder:add(nn.Reshape(feature_maps,14,14))
+decoder:add(nn.Transpose({2,3},{3,4}))
 
 decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
-decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
+-- decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
+decoder:add(nn.LinearCR(feature_maps,colorchannels*factor*factor))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 

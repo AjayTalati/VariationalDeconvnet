@@ -3,8 +3,12 @@ local SpatialDeconvolution, parent = torch.class('nn.SpatialDeconvolution', 'nn.
 function SpatialDeconvolution:__init(inputSize, outputSize,factor)
     parent.__init(self)
 
-   self.weight = torch.Tensor(outputSize * factor * factor, inputSize)
-   self.gradWeight = torch.Tensor(outputSize * factor * factor, inputSize)
+    self.weight = torch.Tensor(outputSize * factor * factor, inputSize)
+    self.bias = torch.Tensor(outputSize * factor * factor)
+
+    self.gradWeight = torch.Tensor(outputSize * factor * factor, inputSize)
+    self.gradBias = torch.Tensor(outputSize * factor * factor)
+
    self.factor = factor
    
    self:reset()
@@ -13,6 +17,9 @@ end
 function SpatialDeconvolution:reset()
     local sigmaInit = 0.01
     self.weight:normal(0, sigmaInit)
+    self.bias:normal(0, sigmaInit)
+
+
 end
 
 
@@ -23,7 +30,13 @@ function SpatialDeconvolution:updateOutput(input)
         self.output = torch.Tensor()
     end
 
-    self.output:resize(input:size(1), self.weight:size(1)):fill(0)
+    local nframe = input:size(1)
+    local nunit = self.bias:size(1)
+
+    self.output:resize(nframe, nunit)
+    self.output:zero():addr(1, input.new(nframe):fill(1), self.bias)
+
+    -- self.output:resize(input:size(1), self.weight:size(1)):fill(self.bias)
 
     self.output:addmm(input, self.weight:t())
 
@@ -45,6 +58,10 @@ end
 
 function SpatialDeconvolution:accGradParameters(input, gradOutput, scale)
     local scale = scale or 1
+    local nframe = input:size(1)
+
     self.gradWeight:addmm(scale, gradOutput:t(), input)
+    self.gradBias:addmv(scale, gradOutput:t(), input.new(nframe):fill(1))
+
     return self.gradWeight
 end

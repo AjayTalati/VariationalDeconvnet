@@ -8,7 +8,7 @@ end
 
 function LinearCR:reset()
     sigmaInit = 0.01
-    self.weight:normal(0, 0.01)
-    self.bias:normal(0, 0.01)
+    self.weight:normal(0, sigmaInit)
+    self.bias:normal(0, sigmaInit)
 end
 

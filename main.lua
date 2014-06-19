@@ -3,7 +3,7 @@ require 'xlua'
 require 'torch'
 require 'nn'
 
-require 'Adagrad'
+require 'AdagradCUDA'
 require 'KLDCriterion'
 
 require 'LinearCR'
@@ -48,7 +48,7 @@ opfunc = function(batch)
     model:backward(batch,df_dw)
     local encoder_output = model:get(1).output
 
-    if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
+    if cuda then
        encoder_output[1] = encoder_output[1]:double()
        encoder_output[2] = encoder_output[2]:double()
     end
@@ -124,7 +124,6 @@ while true do
         if cuda then
             batch = torch.CudaTensor(iend-i+1,trainData.data:size(2),input_size,input_size)
         end
-
 
         local k = 1
         for j = i,iend do
