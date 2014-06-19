@@ -5,9 +5,9 @@ require 'SpatialZeroPaddingCUDA'
 cuda = true
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.02 -- Learning rate used in AdaGrad
+learningRate = 0.05 -- Learning rate used in AdaGrad
 
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
+initrounds = 5 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
@@ -46,7 +46,6 @@ encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,fil
 encoder:add(nn.Threshold(0,1e-6))
 
 --layer2
---Refactor SZP to use dim 3 and 4 so no need for double transpose
 encoder:add(nn.SpatialZeroPaddingCUDA(pad_2,pad_2,pad_2,pad_2)) 
 encoder:add(nn.SpatialConvolutionCUDA(feature_maps,feature_maps_2,filter_size_2,filter_size_2,1,1))
 encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
@@ -67,7 +66,7 @@ decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size,map_size))
 decoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2))
 decoder:add(nn.Transpose({1,4},{1,3},{1,2}))
 decoder:add(nn.SpatialConvolutionCUDA(feature_maps_2,feature_maps,filter_size_2,filter_size_2,1,1))
-decoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+decoder:add(nn.Transpose({1,4}))
 --layer1
 decoder:add(nn.Reshape((map_size^2)*batchSize,feature_maps))
 decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
