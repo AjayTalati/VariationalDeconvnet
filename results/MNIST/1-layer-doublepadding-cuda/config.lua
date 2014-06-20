@@ -1,5 +1,6 @@
 require 'cutorch'
 require 'cunn'
+require 'SpatialZeroPaddingCUDA'
 
 cuda = true
 
