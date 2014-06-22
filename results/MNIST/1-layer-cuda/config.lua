@@ -37,7 +37,6 @@ factor = input_size/14
 
 
 encoder = nn.Sequential()
---encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
 encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
@@ -60,7 +59,7 @@ decoder:add(nn.Reshape(feature_maps,14,14))
 decoder:add(nn.Transpose({2,3},{3,4}))
 
 decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
---decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
+-- decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
 decoder:add(nn.LinearCR(feature_maps,colorchannels*factor*factor))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))

@@ -1,4 +1,5 @@
----TEMPLATE CONFIG FILE
+--One layer deconvnet with padding
+
 
 ---Required 
 batchSize = 128 -- size of mini-batches

@@ -82,7 +82,7 @@ function getLowerbound(data)
 
         local encoder_output = model:get(1).output
         
-        if torch.typename(model:get(1).output[1]) == 'torch.CudaTensor' then
+        if cuda then
             encoder_output[1] = encoder_output[1]:double()
             encoder_output[2] = encoder_output[2]:double()
         end
