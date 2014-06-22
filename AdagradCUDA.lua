@@ -30,7 +30,7 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
         local prior = weights[i].new()
     	prior:resizeAs(weights[i]):fill(0)
 
-        if i % 2 ~= 1 then
+        if i % 2 ~= 0 then
             prior:add(-0.5):cmul(weights[i]):mul(batchSize/N)
     	end
 
@@ -39,6 +39,7 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
 
         weights[i]:add(update)
     end
+
 
     collectgarbage()
     return lowerbound
