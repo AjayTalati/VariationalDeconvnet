@@ -23,6 +23,9 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
     local batchSize = batch:size(1)
     local weights, grads, lowerbound = opfunc(batch)
 
+    print(weights)
+    io.read()
+
     for i=1,#h do
         local hupdate = grads[i]:clone()
         h[i]:add(hupdate:cmul(hupdate))
@@ -30,7 +33,8 @@ function adaGradUpdate(batch, N, learningRate, opfunc, h)
         local prior = weights[i].new()
     	prior:resizeAs(weights[i]):fill(0)
 
-        if i % 2 ~= 0 then
+
+        if i % 2 == 1 then
             prior:add(-0.5):cmul(weights[i]):mul(batchSize/N)
     	end
 
