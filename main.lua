@@ -119,19 +119,22 @@ while true do
         local iend = math.min(N,i+batchSize-1)
         xlua.progress(iend, N)
 
-        local batch = torch.Tensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+        local batch
 
         if cuda then
             batch = torch.CudaTensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+        else 
+            batch = torch.Tensor(iend-i+1,trainData.data:size(2),input_size,input_size)
         end
 
         local k = 1
+
         for j = i,iend do
             batch[k] = trainData.data[shuffle[j]]:clone() 
             k = k + 1
         end
 
-        batchlowerbound = adaGradUpdate(batch,N, learningRate, opfunc, h)
+        batchlowerbound = adaGradUpdate(batch, N, learningRate, opfunc, h)
         lowerbound = lowerbound + batchlowerbound
     end
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
