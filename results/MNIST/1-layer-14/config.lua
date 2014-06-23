@@ -63,5 +63,3 @@ model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
-
-print(model)
