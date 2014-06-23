@@ -57,13 +57,13 @@ decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.Reshape(batchSize,feature_maps_2,input_size,input_size))
 
-encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+decoder:add(nn.Transpose({1,4},{1,3},{1,2}))
 decoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolutionCUDA(feature_maps_2,feature_maps,filter_size,filter_size))
 
 decoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolutionCUDA(feature_maps,colorchannels,filter_size,filter_size))
-encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+decoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
