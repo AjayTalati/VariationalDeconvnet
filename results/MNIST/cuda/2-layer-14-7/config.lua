@@ -24,7 +24,7 @@ pad2 = 2
 pad2_1 = 2
 pad2_2 = 1
 total_output_size = 1 * input_size ^ 2
-feature_maps = 15
+feature_maps = 32
 feature_maps_2 = feature_maps*2
 
 map_size = 14
@@ -52,13 +52,18 @@ encoder:add(z)
 
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps_2 * map_size_2^2))
-decoder:add(nn.Threshold(0,0))
+decoder:add(nn.Threshold(0,1e-6))
 --layer2
 decoder:add(nn.Reshape((map_size_2^2)*batchSize,feature_maps_2))
-decoder:add(nn.SpatialDeconvolution(feature_maps_2,feature_maps,factor_2))
+decoder:add(nn.LinearCR(feature_maps_2,hidden_dec_2))
+decoder:add(nn.Threshold(0,1e-6))
+decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
+decoder:add(nn.Threshold(0,1e-6))
 --layer1
 decoder:add(nn.Reshape((map_size^2)*batchSize,feature_maps))
-decoder:add(nn.SpatialDeconvolution(feature_maps,1,factor))
+decoder:add(nn.LinearCR(feature_maps,hidden_dec))
+decoder:add(nn.Threshold(0,1e-6))
+decoder:add(nn.LinearCR(hidden_dec_1,colorchannels*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 

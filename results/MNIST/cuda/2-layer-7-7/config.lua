@@ -31,6 +31,7 @@ pad_2 = (filter_size_2-1)/2
 total_output_size = 1 * input_size ^ 2
 feature_maps = 32
 feature_maps_2 = feature_maps*2
+factor = 2
 
 hidden_dec = 50
 

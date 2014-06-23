@@ -32,6 +32,7 @@ colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 32
 feature_maps_2 = feature_maps*2
+factor = 2
 
 map_size = 14
 map_size_2 = map_size
