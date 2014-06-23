@@ -22,23 +22,22 @@ testData.data = testData.data:cuda()
 -- Model Specific parameters
 filter_size = 5
 filter_size_2 = 5
-stride = 2
+stride = 4
 dim_hidden = 25
 input_size = 28 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
-pad2 = 2
+pad1 = 3 --NB new size must be divisible with filtersize
+pad2 = 3
 pad_2 = (filter_size_2-1)/2
-colorchannels = 1
-total_output_size = colorchannels * input_size ^ 2
+total_output_size = 1 * input_size ^ 2
 feature_maps = 32
 feature_maps_2 = feature_maps*2
 
-map_size = 14
-map_size_2 = map_size
-
 hidden_dec = 50
 
+map_size = 7
+map_size_2 = 7
 
+colorchannels = 1
 
 --layer1
 encoder = nn.Sequential()
