@@ -1,7 +1,7 @@
 batchSize = 100 -- size of mini-batches
-learningRate = 0.05 -- Learning rate used in AdaGrad
+learningRate = 0.02 -- Learning rate used in AdaGrad
 
-initrounds = 5 -- Amount of intialization rounds in AdaGrad
+initrounds = 15 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000 -- Size of training set
 tesize = 10000 -- Size of test set
@@ -32,11 +32,11 @@ factor = input_size/map_size
 
 --layer1
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(1,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,1e-6))
 --layer2
-encoder:add(nn.SpatialZeroPaddingC(pad_2,pad_2,pad_2,pad_2))
+encoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2))
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2,1,1))
 encoder:add(nn.Threshold(0,1e-6))
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2^2))
@@ -52,7 +52,7 @@ decoder:add(nn.LinearCR(dim_hidden, feature_maps_2 * map_size_2^2))
 decoder:add(nn.Threshold(0,1e-6))
 --layer2
 decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size,map_size))
-decoder:add(nn.SpatialZeroPaddingC(pad_2,pad_2,pad_2,pad_2))
+decoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2))
 decoder:add(nn.SpatialConvolution(feature_maps_2,feature_maps,filter_size_2,filter_size_2,1,1))
 --layer1
 decoder:add(nn.Reshape((map_size^2)*batchSize,feature_maps))
