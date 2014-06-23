@@ -21,13 +21,13 @@ testData.data = testData.data:cuda()
 
 -- Model Specific parameters
 filter_size = 5
-stride = 1
 dim_hidden = 25
 input_size = 28
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 total_output_size = 1 * input_size ^ 2
-feature_maps = 16
+feature_maps = 32
+feature_maps_2 = 64
 colorchannels = 1
 
 map_size = 28^2
@@ -36,7 +36,11 @@ map_size = 28^2
 encoder = nn.Sequential()
 encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
 encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
+encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
+
+encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialConvolutionCUDA(feature_maps,feature_maps_2,filter_size,filter_size))
+
 encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 encoder:add(nn.Threshold(0,1e-6))
 
@@ -51,11 +55,13 @@ encoder:add(z)
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,1e-6))
-
 decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
-decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
-decoder:add(nn.SpatialConvolution(feature_maps,colorchannels,filter_size,filter_size,stride,stride))
 
+decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+decoder:add(nn.SpatialConvolution(feature_maps_2,feature_maps,filter_size,filter_size))
+
+decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+decoder:add(nn.SpatialConvolution(feature_maps,colorchannels,filter_size,filter_size))
 
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
