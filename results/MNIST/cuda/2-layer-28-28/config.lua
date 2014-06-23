@@ -50,7 +50,7 @@ z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
 encoder:add(z)
 
 local decoder = nn.Sequential()
-decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
+decoder:add(nn.LinearCR(dim_hidden, feature_maps_2 * map_size))
 decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.Reshape(batchSize,feature_maps_2,input_size,input_size))
 
