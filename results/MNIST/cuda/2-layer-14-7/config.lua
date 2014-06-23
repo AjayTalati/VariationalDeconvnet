@@ -26,19 +26,20 @@ stride = 2
 stride_2 = 2
 dim_hidden = 25
 input_size = 28 --NB this is done later (line 129)
-pad1_1 = 1 --NB new size must be divisible with filtersize
+pad1_1 = 2 --NB new size must be divisible with filtersize
 pad1_2 = 2
-pad2_1 = 1
+pad2_1 = 2
 pad2_2 = 2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
-feature_maps = 32
+feature_maps = 16
 feature_maps_2 = feature_maps*2
 factor = 2
 
 map_size = 14
 map_size_2 = 7
 
+ --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
 hidden_dec = 40
 hidden_dec_2 = 80
 
@@ -46,16 +47,16 @@ hidden_dec_2 = 80
 
 --layer1
 encoder = nn.Sequential()
-encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
-encoder:add(nn.SpatialZeroPaddingCUDA(pad1_1,pad1_2,pad1_1,pad1_2))
-encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
+encoder:add(nn.SpatialZeroPadding(pad1_1,pad1_2,pad1_1,pad1_2))
+encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+encoder:add(nn.SpatialMaxPooling(2,2,2,2)
 encoder:add(nn.Threshold(0,1e-6))
 
 --layer2
 
-encoder:add(nn.SpatialZeroPaddingCUDA(pad2_1,pad2_2,pad2_1,pad2_2)) 
-encoder:add(nn.SpatialConvolutionCUDA(feature_maps,feature_maps_2,filter_size_2,filter_size_2,stride_2,stride_2))
-encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+encoder:add(nn.SpatialZeroPadding(pad2_1,pad2_2,pad2_1,pad2_2)) 
+encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2))
+encoder:add(nn.SpatialMaxPooling(2,2,2,2)
 encoder:add(nn.Threshold(0,1e-6))
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2^2))
 
@@ -72,12 +73,12 @@ decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.Reshape((map_size_2^2)*batchSize,feature_maps_2))
 decoder:add(nn.LinearCR(feature_maps_2,hidden_dec_2))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
+decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor))
 decoder:add(nn.Threshold(0,1e-6)
 --layer1
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor)) 
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
