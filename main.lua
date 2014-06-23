@@ -108,7 +108,6 @@ if opt.continue == true then --NB need to convert tensor to list!
     epoch = lowerboundlist:size(1)
 else
     epoch = 0
-    lowerbound_test_list = {}
     h = adaGradInit(trainData.data, opfunc, batchSize, initrounds)
 end
 
