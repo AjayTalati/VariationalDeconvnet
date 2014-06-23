@@ -56,7 +56,7 @@ encoder:add(nn.Threshold(0,1e-6))
 
 encoder:add(nn.SpatialZeroPadding(pad2_1,pad2_2,pad2_1,pad2_2)) 
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2))
-encoder:add(nn.SpatialMaxPooling(2,2,2,2)
+encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2^2))
 
@@ -76,7 +76,7 @@ decoder:add(nn.Reshape(map_size_2*map_size_2*batchSize,feature_maps_2))
 decoder:add(nn.LinearCR(feature_maps_2,hidden_dec_2))
 decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor))
-decoder:add(nn.Threshold(0,1e-6)
+decoder:add(nn.Threshold(0,1e-6))
 --layer1
 decoder:add(nn.LinearCR(feature_maps*factor*factor,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
