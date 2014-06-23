@@ -42,8 +42,8 @@ colorchannels = 1
 
 --layer1
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,1e-6))
 
@@ -65,8 +65,8 @@ decoder:add(nn.LinearCR(dim_hidden, feature_maps_2 * map_size_2^2))
 decoder:add(nn.Threshold(0,1e-6))
 --layer2
 decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size,map_size))
-decoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2))
 decoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+decoder:add(nn.SpatialZeroPaddingCUDA(pad_2,pad_2,pad_2,pad_2))
 decoder:add(nn.SpatialConvolutionCUDA(feature_maps_2,feature_maps,filter_size_2,filter_size_2,1,1))
 decoder:add(nn.Transpose({1,4}))
 --layer1
