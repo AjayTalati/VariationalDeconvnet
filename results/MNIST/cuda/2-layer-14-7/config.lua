@@ -1,5 +1,3 @@
-print('loading config')
-
 batchSize = 100 -- size of mini-batches
 learningRate = 0.05 -- Learning rate used in AdaGrad
 
@@ -26,6 +24,9 @@ pad2_2 = 1
 total_output_size = 1 * input_size ^ 2
 feature_maps = 32
 feature_maps_2 = feature_maps*2
+
+hidden_dec = 50
+hidden_dec_2 = 100
 
 map_size = 14
 map_size_2 = 7
@@ -63,7 +64,7 @@ decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.Reshape((map_size^2)*batchSize,feature_maps))
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec_1,colorchannels*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
