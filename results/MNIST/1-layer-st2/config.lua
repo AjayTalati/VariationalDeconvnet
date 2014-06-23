@@ -25,33 +25,37 @@ colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
 
-map_size = 14^2
-factor = input_size/14
+hidden_dec = 20
+
+map_size = 14
+factor = stride
 
 
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
 
-encoder:add(nn.Reshape(feature_maps * map_size))
+encoder:add(nn.Reshape(feature_maps * map_size * map_size))
 
 local z = nn.ConcatTable()
-z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
-z:add(nn.LinearCR(feature_maps * map_size, dim_hidden))
+z:add(nn.LinearCR(feature_maps * map_size * map_size, dim_hidden))
+z:add(nn.LinearCR(feature_maps * map_size * map_size, dim_hidden))
 
 encoder:add(z)
 
 local decoder = nn.Sequential()
-decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
+decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size * map_size))
 decoder:add(nn.Threshold(0,0))
 
-decoder:add(nn.Reshape(feature_maps,14,14))
+decoder:add(nn.Reshape(feature_maps,map_size,map_size))
 decoder:add(nn.Transpose({2,3},{3,4}))
 
-decoder:add(nn.Reshape(map_size*batchSize,feature_maps))
+decoder:add(nn.Reshape(map_size*map_size*batchSize,feature_maps))
 -- decoder:add(nn.SpatialDeconvolution(feature_maps,colorchannels,factor))
-decoder:add(nn.LinearCR(feature_maps,colorchannels*factor*factor))
+decoder:add(nn.LinearCR(feature_maps,hidden_dec))
+decoder:add(nn.Threshold(0,0))
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
