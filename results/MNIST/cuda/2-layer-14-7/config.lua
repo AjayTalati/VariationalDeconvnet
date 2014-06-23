@@ -49,7 +49,7 @@ hidden_dec_2 = 80
 encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1_1,pad1_2,pad1_1,pad1_2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
-encoder:add(nn.SpatialMaxPooling(2,2,2,2)
+encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 
 --layer2
@@ -78,9 +78,9 @@ decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor))
 decoder:add(nn.Threshold(0,1e-6)
 --layer1
-decoder:add(nn.LinearCR(feature_maps,hidden_dec))
+decoder:add(nn.LinearCR(feature_maps*factor*factor,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor)) 
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor^4)) 
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
