@@ -34,11 +34,12 @@ map_size = 28^2
 --factor = input_size/ 16
 
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
 
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size,filter_size))
+
 encoder:add(nn.Threshold(0,1e-6))
 encoder:add(nn.Reshape(feature_maps * map_size))
 
@@ -55,7 +56,6 @@ decoder:add(nn.Reshape(batchSize,feature_maps_2,input_size,input_size))
 
 decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolution(feature_maps_2,feature_maps,filter_size,filter_size))
-
 decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolution(feature_maps,colorchannels,filter_size,filter_size))
 
