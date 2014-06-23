@@ -9,7 +9,6 @@ require 'KLDCriterion'
 require 'LinearCR'
 require 'Reparametrize'
 require 'SpatialDeconvolution'
-require 'SpatialZeroPaddingC'
 
 require 'load'
 
@@ -96,13 +95,19 @@ end
 
 
 if opt.continue == true then --NB need to convert tensor to list!
-    lowerboundlist = torch.load(opt.load ..        'lowerbound.t7')
-    lowerbound_test_list =  torch.load(opt.load .. 'lowerbound_test.t7')
-    h = torch.load(opt.load .. 'adagrad.t7')
-    epoch = lowerboundList:size(1)
+    print("Loading old weights!")
+    lowerboundlist = torch.load(opt.save ..        'lowerbound.t7')
+    lowerbound_test_list =  torch.load(opt.save .. 'lowerbound_test.t7')
+    h = torch.load(opt.save .. 'adagrad.t7')
+    w = torch.load(opt.save .. 'weights.t7')
+
+    weights, gradients = model:getParameters()
+
+    weights:copy(w)
+
+    epoch = lowerboundlist:size(1)
 else
     epoch = 0
-    lowerboundlist = {}
     lowerbound_test_list = {}
     h = adaGradInit(trainData.data, opfunc, batchSize, initrounds)
 end
@@ -137,13 +142,26 @@ while true do
         batchlowerbound = adaGradUpdate(batch, N, learningRate, opfunc, h)
         lowerbound = lowerbound + batchlowerbound
     end
+
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
-    table.insert(lowerboundlist, lowerbound/N)
+
+    if lowerboundlist then
+        lowerboundlist = torch.cat(lowerboundlist,torch.Tensor(1,1):fill(lowerbound/N),1)
+    else
+        lowerboundlist = torch.Tensor(1,1):fill(lowerbound/N)
+    end
+
 
     if epoch % 5 == 0 then
         print('Calculating test lowerbound\n')
         lowerbound_test = getLowerbound(testData.data)
-        table.insert(lowerbound_test_list, lowerbound_test/N_test)
+
+         if lowerbound_test_list then
+            lowerbound_test_list = torch.cat(lowerbound_test_list,torch.Tensor(1,1):fill(lowerbound_test/N_test),1)
+        else
+            lowerbound_test_list = torch.Tensor(1,1):fill(lowerbound_test/N_test)
+        end
+
         print('testlowerbound = ')
         print(lowerbound_test/N_test)
         print("Saving weights...")
