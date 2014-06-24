@@ -32,6 +32,7 @@ input_size = 28 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 pad_2 = (filter_size_2-1)/2
+output_size = 24
 total_output_size = 1 * input_size ^ 2
 feature_maps = 16
 feature_maps_2 = feature_maps * 2
@@ -43,7 +44,7 @@ hidden_dec_2 = 50
 map_size = 12
 map_size_2 = map_size / 2
 map_size_3 = 6
-factor = input_size/map_size
+factor = 2
 
 colorchannels = 1
  
@@ -95,7 +96,10 @@ decoder:add(nn.LinearCR(feature_maps*factor*factor,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor^4)) 
 decoder:add(nn.Sigmoid())
+decoder:add(nn.Reshape(batchSize, colorchannels,output_size,output_size)
+decoder:add(nn.SpatialZeroPadding(2,2,2,2))
 decoder:add(nn.Reshape(batchSize,total_output_size))
+
 
 model = nn.Sequential()
 model:add(encoder)
