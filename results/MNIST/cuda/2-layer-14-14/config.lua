@@ -73,6 +73,8 @@ decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size,map_size))
 decoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2))
 decoder:add(nn.SpatialConvolution(feature_maps_2,feature_maps,filter_size_2,filter_size_2))
 --layer1
+decoder:add(nn.Reshape(feature_maps,map_size,map_size))
+decoder:add(nn.Transpose({2,3},{3,4}))
 decoder:add(nn.Reshape((map_size^2)*batchSize,feature_maps))
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
