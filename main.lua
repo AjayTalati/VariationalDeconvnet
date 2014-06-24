@@ -48,7 +48,9 @@ opfunc = function(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
     local target = batch:reshape(batchSize,total_output_size)
+	print(torch.norm(f:double()))
     local err = criterion:forward(f, target)
+	print(err)
     local df_dw = criterion:backward(f, target)
 
     model:backward(batch,df_dw)
