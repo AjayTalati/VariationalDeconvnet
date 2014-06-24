@@ -31,7 +31,7 @@ dim_hidden = 25
 input_size = 28 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
-pad_2 = (filter_size_2-1)/2
+pad_2 = 2
 total_output_size = 1 * input_size ^ 2
 feature_maps = 16
 feature_maps_2 = feature_maps * 2
@@ -47,17 +47,16 @@ factor = input_size/map_size
 
 colorchannels = 1
  
-
 --layer1
 encoder = nn.Sequential()
-
-encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialZeroPadding(2,2,2,2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 
 --layer2
-encoder:add(nn.SpatialZeroPadding(pad2,pad1,pad2,pad1))
+
+encoder:add(nn.SpatialZeroPadding(2,2,2,2))
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2))
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
@@ -83,7 +82,7 @@ decoder:add(nn.Reshape(batchSize,feature_maps_3,map_size_3,map_size_3))
 decoder:add(nn.SpatialZeroPadding(2,2,2,2))
 decoder:add(nn.SpatialConvolution(feature_maps_3,feature_maps_2,filter_size_2,filter_size_2))
 --layer2
-decoder:add(nn.Reshape(feature_maps_2,map_size_2,map_size_2))
+decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size_2,map_size_2))
 decoder:add(nn.Transpose({2,3},{3,4}))
 decoder:add(nn.Reshape(map_size_2*map_size_2*batchSize,feature_maps_2))
 decoder:add(nn.LinearCR(feature_maps_2,hidden_dec_2))

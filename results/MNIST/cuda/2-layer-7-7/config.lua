@@ -41,22 +41,20 @@ map_size_2 = 7
 hidden_dec = 50
 
 
-
 colorchannels = 1
+encoder = nn.Sequential()
 
 --layer1
-encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPooling(4,4,4,4))
 encoder:add(nn.Threshold(0,1e-6))
 
 --layer2
-
 encoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2)) 
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2))
-
 encoder:add(nn.Threshold(0,1e-6))
+
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2^2))
 
 local z = nn.ConcatTable()
@@ -69,7 +67,7 @@ local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps_2 * map_size_2^2))
 decoder:add(nn.Threshold(0,1e-6))
 --layer2
-decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size,map_size))
+decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size_2,map_size_2))
 decoder:add(nn.SpatialZeroPadding(pad_2,pad_2,pad_2,pad_2))
 decoder:add(nn.SpatialConvolution(feature_maps_2,feature_maps,filter_size_2,filter_size_2))
 --layer1
