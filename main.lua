@@ -32,17 +32,23 @@ end
 
 require (opt.save .. '/config')
 
-BCE = nn.BCECriterion()
-BCE.sizeAverage = false
+if continuous then
+    criterion = nn.GaussianCriterion()
+else
+    criterion = nn.BCECriterion()
+    criterion.sizeAverage = false
+
+end
 KLD = nn.KLDCriterion()
 
 opfunc = function(batch) 
     model:zeroGradParameters()
     local f = model:forward(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
-    local target = batch:double():reshape(batchSize,total_output_size)
-    local err = BCE:forward(f, target)
-    local df_dw = BCE:backward(f, target)
+
+    local target = batch:reshape(batchSize,total_output_size)
+    local err = criterion:forward(f, target)
+    local df_dw = criterion:backward(f, target)
 
     model:backward(batch,df_dw)
     local encoder_output = model:get(1).output
@@ -63,6 +69,7 @@ opfunc = function(batch)
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
+    print(lowerbound/batch:size(1))
     local weights, grads = model:parameters()
 
     return weights, grads, lowerbound
@@ -77,7 +84,7 @@ function getLowerbound(data)
         local batch = data[{{i,iend},{}}]
         local f = model:forward(batch)
         local target = batch:double():reshape(batchSize,total_output_size)
-        local err = BCE:forward(f, target)
+        local err = criterion:forward(f, target)
 
         local encoder_output = model:get(1).output
         
