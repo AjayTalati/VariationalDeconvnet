@@ -7,9 +7,9 @@ require 'cunn'
 cuda = true
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.02 -- Learning rate used in AdaGrad
+learningRate = 0.01 -- Learning rate used in AdaGrad
 
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
+initrounds = 20 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
