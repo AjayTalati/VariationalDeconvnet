@@ -29,7 +29,7 @@ filter_size_3 = 5
 stride = 2
 dim_hidden = 25
 input_size = 28 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
+pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 pad_2 = (filter_size_2-1)/2
 total_output_size = 1 * input_size ^ 2
@@ -79,8 +79,8 @@ local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps_3 * map_size_3^2))
 decoder:add(nn.Threshold(0,1e-6))
 --layer3
-decoder:add(nn.Reshape(batchSize,feature_maps_3,map_size_2,map_size_2))
-decoder:add(nn.SpatialZeroPadding(1,1,1,1))
+decoder:add(nn.Reshape(batchSize,feature_maps_3,map_size_3,map_size_3))
+decoder:add(nn.SpatialZeroPadding(2,2,2,2))
 decoder:add(nn.SpatialConvolution(feature_maps_3,feature_maps_2,filter_size_2,filter_size_2))
 --layer2
 decoder:add(nn.Reshape(feature_maps_2,map_size_2,map_size_2))
