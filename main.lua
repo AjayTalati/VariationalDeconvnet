@@ -9,6 +9,7 @@ require 'KLDCriterion'
 require 'LinearCR'
 require 'Reparametrize'
 require 'SpatialDeconvolution'
+require 'BCECriterionC'
 
 require 'load'
 
@@ -35,7 +36,7 @@ require (opt.save .. '/config')
 if continuous then
     criterion = nn.GaussianCriterion()
 else
-    criterion = nn.BCECriterion()
+    criterion = nn.BCECriterionC()
     criterion.sizeAverage = false
 
 end
