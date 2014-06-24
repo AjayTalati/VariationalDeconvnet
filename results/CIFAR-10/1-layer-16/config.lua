@@ -1,22 +1,26 @@
 --One layer deconvnet with padding
 require 'GaussianCriterion'
-
+require 'cutorch'
+require 'cunn'
+require 'SpatialZeroPaddingCUDA'
+cuda = true
 continuous = true
 
 ---Required 
-batchSize = 100 -- size of mini-batches
+batchSize = 128 -- size of mini-batches
 learningRate = 0.03 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
-trsize = 50000 -- Size of training set
-tesize = 10000 -- Size of test set
+trsize = 50000-80 -- Size of training set
+tesize = 10000-16 -- Size of test set
 
 -- Loading data
 -- trainData is table with field 'data' which contains the data
-print("Loading data")
 trainData, testData = loadCifar(trsize,tesize,false)
-print("Data loading done")
+
+trainData.data = trainData.data:cuda()
+testData.data = testData.data:cuda()
 
 -- Model Specific parameters
 filter_size = 5
@@ -36,10 +40,17 @@ factor = stride
 
 
 encoder = nn.Sequential()
+----------------------------   CUDA:    ----------------------------------------------------
+--encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+--encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
+--encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
+--encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+-- ---------------------------         Regular:        --------------------------
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+-----------------------------------------------------------------------------------------
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
-encoder:add(nn.Threshold(0,0))
+encoder:add(nn.Threshold(0,1e-6))
 
 encoder:add(nn.Reshape(feature_maps * map_size * map_size))
 
@@ -51,14 +62,14 @@ encoder:add(z)
 
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size * map_size))
-decoder:add(nn.Threshold(0,0))
+decoder:add(nn.Threshold(0,1e-6))
 
 decoder:add(nn.Reshape(feature_maps,map_size,map_size))
 decoder:add(nn.Transpose({2,3},{3,4}))
 
 decoder:add(nn.Reshape(map_size*map_size*batchSize,feature_maps))
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
-decoder:add(nn.Threshold(0,0))
+decoder:add(nn.Threshold(0,1e-6))
 
 decoder2 = nn.ConcatTable()
 decoder2:add(nn.LinearCR(hidden_dec, colorchannels*factor*factor))
