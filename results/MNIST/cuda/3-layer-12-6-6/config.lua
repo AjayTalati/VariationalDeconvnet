@@ -96,7 +96,7 @@ decoder:add(nn.LinearCR(feature_maps*factor*factor,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor^4)) 
 decoder:add(nn.Sigmoid())
-decoder:add(nn.Reshape(batchSize, colorchannels,output_size,output_size)
+decoder:add(nn.Reshape(batchSize, colorchannels,output_size,output_size))
 decoder:add(nn.SpatialZeroPadding(2,2,2,2))
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
