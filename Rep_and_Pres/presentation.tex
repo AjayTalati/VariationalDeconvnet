@@ -147,8 +147,28 @@ The gradient of a convolution is relatively straightforward.\\ Let $L$ be the lo
 \begin{frame}
 \frametitle{Unsupervised Training with SGVB}
 %image of example structure with latent variables and deconvolution
-Model $P(\mathbf{X},\mathbf{Z}) = \frac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \\ 
-Here, $P(\mathbf{X}|\mathbf{Z})$ and $P(\mathbf{Z}|\mathbf{X})$ are modeled by the Convolutional layers and the Deconvolutional layers, respectively.
+Model $P(\mathbf{X},\mathbf{Z}) = \frac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \vspace{0.5mm}
+Here, $P(\mathbf{X}|\mathbf{Z})$ is the deconvolutional layer and the intractable $P(\mathbf{Z}|\mathbf{X})$ is approximated by $q(\mathbf{Z}|\mathbf{X})$, which is the Convolutional layer.
+%mention that we need to train the parameters of the network and that we can use this for pretraining an convnet, but also have a generative model which can be used for many different tasks.
+\end{frame}
+
+\begin{frame}
+\frametitle{Marginal Likelihood as Optimization Criterion}
+%Of course, we want to learn the parameters via gradient descent on some objective function
+The marginal probability of $\mathbf{X}$ can be written as:
+\begin{align*}
+\log p_\theta(\mathbf{X}) = D_{KL}(q_\phi(\mathbf{Z}|\mathbf{X}) || p_\theta(\mathbf{Z}|\mathbf{X})) + \mathcal{L}(\mathbf{\theta}, \mathbf{\phi}; \mathbf{X})
+\end{align*}
+Where 
+$\mathcal{L}(\mathbf{\theta}, \mathbf{\phi}; \mathbf{X})$
+is the \textit{lower bound} on the marginal likelihood
+$
+P(\mathbf{X}) = \int_z P(\mathbf{Z})P(\mathbf{X}|\mathbf{Z})d\mathbf{Z}$
+\end{frame}
+
+\begin{frame}
+\frametitle{Reparameterization}
+We need to estimate (stochastic) gradients w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now we can sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$ and we can perform stochastic gradient descent on the model parameters!
 \end{frame}
 
 \section{Research Questions}
