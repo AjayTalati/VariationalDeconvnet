@@ -34,7 +34,7 @@
 \author{Joost van Amersfoort \& Otto Fabius} 
 \institute[UvA] 
 {University of Amsterdam
-% Your institution for the title page
+Supervisor: Diederik Kingma
 \medskip
 }
 \date{\today} % Date, can be changed to a custom date
@@ -131,7 +131,7 @@ We need to estimate (stochastic) gradients w.r.t the model parameters. For this,
 \frametitle{Implementation using \href{http://torch.ch/}{Torch7}}
 \begin{itemize}
 	\item Torch7 is a framework on top of Lua, utilizing the LuaJIT and crucial parts are in C/CUDA code
-	\item Models in Torch7 consist of a stack of modules, e.g. Sigmoid, Linear and Convolution
+	\item Models in Torch7 consist of a stack of modules (layers), e.g. Sigmoid, Linear and Convolution
 	\item A module consists roughly of three functions:
 		\begin{itemize}
 			\item updateInput, which defines how the input is updated
@@ -238,15 +238,40 @@ Restrictions:
 %explain that the options have pros and cons, perhaps another slide on what worked best for a given architecture?
 \end{frame}
 
+\begin{frame}
+\frametitle{Possible one layer architectures}
+
+\begin{itemize}
+	\item For one layer networks there are two options: with and without dimensionality reduction
+	\item In an architecture without dimensionality reduction we perform zero padding with filter size - 1 before convolution. 
+		\begin{itemize}
+			\item Both encoder and decoder consist of padding and convolution layer
+		\end{itemize}
+	\item In an architecture with dimensionality reduction we use a convolution with a stride higher than 1 or a max 
+	pooling layer
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Results of one layer architectures}
+	\begin{itemize}
+		\item Without dimensionality reduction gives UNKNOWN - ALIEN - THERE ARE NO ANSWERS HERE
+		\item Dimensionality reduction using stride 2 leads to a lowerbound of -105 after convergence. This is similar to the result of the fully connected network of \cite{kingma2013stochastic}, with one third of the number of parameters and much faster convergence
+		\item Dimensionality reduction using Max Pooling converges to a slightly higher lowerbound of -106. Showing that it's slightly harder to invert this operation.
+	\end{itemize}
+
+\end{frame}
 
 \section{Discussion}
 
 
-%-----------------------------------------------
-%\begin{frame}[shrink=20]{Bibliography}
-%	\bibliographystyle{ieeetr}
-%	\bibliography{ref}
-%\end{frame}
+% %-----------------------------------------------
+\begin{frame}{Bibliography}
+	\nocite{*}
+	\bibliographystyle{ieeetr}
+	\bibliography{ref}
+\end{frame}
 
 %------------------------------------------------
 
