@@ -127,7 +127,6 @@
 \section{Theory}
 
 \subsection{Convolutional Neural Networks}
-
 \begin{frame}
 \frametitle{Convolutional Neural Networks - Error Backpropagation}
 The gradient of a convolution is relatively straightforward.\\ Let $L$ be the loss function, and $y = x$ \textasteriskcentered $k$ the convolution operation with weights $W$, then \\   
@@ -154,7 +153,7 @@ Here, $P(\mathbf{X}|\mathbf{Z})$ is the deconvolutional layer and the intractabl
 
 \begin{frame}
 \frametitle{Marginal Likelihood as Optimization Criterion}
-%Of course, we want to learn the parameters via gradient descent on some objective function
+%Of course, we want to learn the parameters via gradient descent on some objective function. %Mention work by Kingma and Welling, add reference
 The marginal probability of $\mathbf{X}$ can be written as:
 \begin{align*}
 \log p_\theta(\mathbf{X}) = D_{KL}(q_\phi(\mathbf{Z}|\mathbf{X}) || p_\theta(\mathbf{Z}|\mathbf{X})) + \mathcal{L}(\mathbf{\theta}, \mathbf{\phi}; \mathbf{X})
@@ -168,10 +167,18 @@ P(\mathbf{X}) = \int_z P(\mathbf{Z})P(\mathbf{X}|\mathbf{Z})d\mathbf{Z}$
 
 \begin{frame}
 \frametitle{Reparameterization}
-We need to estimate (stochastic) gradients w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now we can sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$ and we can perform stochastic gradient descent on the model parameters!
+We need to estimate (stochastic) gradients w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now if we sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$, $logp_{\theta}(\mathbf{X})$ is fully differentiable and we can perform stochastic gradient descent on the model parameters!
 \end{frame}
 
 \section{Research Questions}
+\begin{frame}
+\frametitle{Research Questions}
+\begin{enumerate}
+	\item How can we perform Deconvolution?
+	\item What architectures are effective and efficient?
+	\item How well do trained Convolutional Networks model the data, compared to fully connected models?
+\end{enumerate}
+\end{frame}
 
 \section{Implementation}
 
@@ -180,6 +187,10 @@ We need to estimate (stochastic) gradients w.r.t the model parameters. For this,
 \subsection{GPU}
  
 \section{Results}
+
+\begin{frame}
+\frametitle{How can we perform Deconvolution?}
+\end{frame}
 
 \section{Discussion}
 
