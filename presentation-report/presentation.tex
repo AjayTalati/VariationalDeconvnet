@@ -187,15 +187,57 @@ model:add(nn.Linear(128,#classes))
 \section{Results}
 
 \begin{frame}
-\frametitle{How can we perform Deconvolution?}
+\frametitle{How can we perform Deconvolution? - Option 1}
 % here figure of network, onlt the deconvolution part
-%describe the problem of upsampling and weight sharing
-Option 1: for each resulting feature map, learn a weight matrix that creates an NxN window for each pixel in the feature maps of the previous layer.\\
-requirements:
+%describe upsampling and weight sharing
+Perform full deconvolution: 
+\begin{enumerate}
+\item learn an NxN weight matrix (equal to the filtersize of the convolutions) for each feature map to create an NxN window from each pixel. 
+\item reorganise the overlapping NxN windows to reconstruct a feature map of the original dimensions.
+\end{enumerate}
+Restrictions:
 \begin{itemize}
-\item a stride equal to the filter size
+\item None, but this can not be done with the available modules in Torch7.
 \end{itemize} 
+%explain that this is very restrictive
 \end{frame}
+
+\begin{frame}
+\frametitle{How can we perform Deconvolution? - Option 2}
+% here figure of network, onlt the deconvolution part
+For each resulting feature map, learn a weight matrix that creates an NxN window for each pixel in the feature maps of the previous layer.\\ \vspace{2mm}
+Restrictions:
+\begin{itemize}
+\item A stride equal to the filter size
+\end{itemize} 
+%explain that this is very restrictive
+\end{frame}
+
+\begin{frame}
+\frametitle{How can we perform Deconvolution? - Option 3}
+% here figure of network, only the deconvolution part
+Perform a similar convolution as in the encoder, after zero padding to keep the dimensions the same.\\ \vspace{2mm}
+Restrictions:
+\begin{itemize}
+\item The subsequent feature maps must have the same dimensionality
+\end{itemize} 
+% explain why this is restrictive
+\end{frame}
+
+\begin{frame}
+\frametitle{How can we perform Deconvolution? - Option 4}
+%an image here would be simply awesome, otherwise we should probably draw this on the whiteboard.
+
+Use a two-layer MLP with weight sharing to reconstruct the output. Each feature map ha its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
+\\ \vspace{2mm}
+Restrictions:
+\begin{itemize}
+\item The spatial resolution up-sampling factor must be an integer.
+%This is somewhat restrictive, but rarely a problem
+\end{itemize} 
+%explain that the options have pros and cons, perhaps another slide on what worked best for a given architecture?
+\end{frame}
+
 
 \section{Discussion}
 
