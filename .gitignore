@@ -5,3 +5,10 @@ datasets
 *.swp
 model
 *.t7
+*.pdf
+*.out
+*.log
+*.nav
+*.snm
+*.toc
+*.aux

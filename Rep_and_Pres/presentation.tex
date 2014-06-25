@@ -124,8 +124,9 @@
 \end{itemize}
 \end{frame}
 
-\section{Convolutional Neural Networks}
+\section{Theory}
 
+\subsection{Convolutional Neural Networks}
 
 \begin{frame}
 \frametitle{Convolutional Neural Networks - Error Backpropagation}
@@ -142,11 +143,25 @@ The gradient of a convolution is relatively straightforward.\\ Let $L$ be the lo
 %tell something about need for computational resources
 \end{frame}
 
-\section{SGVB}
+\subsection{SGVB}
 \begin{frame}
 \frametitle{Unsupervised Training with SGVB}
-\To train the network with gradient descent, we need an optimization criterion. If we add a fully-connected layer to our convolutional network that connects to latent variables and reconstruct the input from threse latent variables through a "Deconvolutional" Network, we can calculate the lower bound of the likelihood of the data given our model and a prior over the weights
+%image of example structure with latent variables and deconvolution
+Model $P(\mathbf{X},\mathbf{Z}) = \frac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \\ 
+Here, $P(\mathbf{X}|\mathbf{Z})$ and $P(\mathbf{Z}|\mathbf{X})$ are modeled by the Convolutional layers and the Deconvolutional layers, respectively.
 \end{frame}
+
+\section{Research Questions}
+
+\section{Implementation}
+
+\subsection{Torch7}
+
+\subsection{GPU}
+ 
+\section{Results}
+
+\section{Discussion}
 
 
 %-----------------------------------------------

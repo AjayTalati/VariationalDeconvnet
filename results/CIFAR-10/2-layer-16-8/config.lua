@@ -40,6 +40,12 @@ factor = stride
 
 
 encoder = nn.Sequential()
+--L2
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+encoder:add(nn.SpatialMaxPooling(2,2,2,2))
+encoder:add(nn.Threshold(0,1e-6))
+--L2
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
