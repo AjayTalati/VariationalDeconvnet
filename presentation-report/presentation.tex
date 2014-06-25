@@ -24,7 +24,6 @@
     tabsize=2
 }
 
-
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
@@ -60,9 +59,9 @@ Supervisor: Diederik Kingma
 \begin{frame}
 \frametitle{Introduction}
 \begin{itemize}
-	\item Convolutional Networks have had much success recently in Computer Vision tasks, due efficient implementation and an increase in computing power and available annotated data.
-	\item However, to date, no successful means of training such Networks unsupervised has been reported.
-	\item The recently developed SGVB makes efficient, effective Bayesian Inference possible by means of stochastic gradient descent. This can be used to train a ConvNet unsupervised
+	\item Convolutional Networks have had much success recently in Computer Vision tasks, due to an increase in computing power and available annotated data and efficient GPU implementations
+	\item Currently there are no successful means of training such networks unsupervised has been reported
+	\item The recently developed SGVB makes efficient, effective Bayesian Inference possible by means of stochastic gradient descent. This can be used to train a Convolution Neural Network unsupervised
 \end{itemize}
 \end{frame}
 
@@ -80,7 +79,9 @@ The gradient of a convolution is relatively straightforward.\\ Let $L$ be the lo
 \end{frame}
 
 \begin{frame}
-\frametitle{Convolutional Neural Networks - Typical structure}
+\frametitle{Convolutional Neural Networks - Example structure}
+
+\includegraphics[scale = 0.7]{img/convnet.png} \\\cite{farabet2014}
 
 %image of example structure
 %tell something about need for computational resources
@@ -146,11 +147,12 @@ We need to estimate (stochastic) gradients w.r.t the model parameters. For this,
 \begin{lstlisting}
 require 'torch'
 require 'nn'
+
 model = nn.Sequential()
 
 -- stage 1 : standard convolution layer
-model:add(nn.SpatialConvolution(inputLayers, outputLayers, filterSizeW, filterSizeH))
-model:add(nn.SpatialMaxPooling(windowH, windowW, strideH, strideW))
+model:add(nn.SpatialConvolution(1, 16, 5, 5))
+model:add(nn.SpatialMaxPooling(2, 2, 2, 2))
 model:add(nn.Sigmoid())
 
 -- stage 2 : standard 2-layer neural network
@@ -176,9 +178,10 @@ model:add(nn.Linear(128,#classes))
 \frametitle{Using the GPU with Torch7}
 
 \begin{itemize}
-	\item Fairly straight forward process, as long as all modules support CUDA
-	\item To get serious benefit, it was necessary to rewrite most code: instead of computation power, now memory is the scarce resource
-	\item Important notes: necessary to use specific CUDA modules and single precision instead of double leads to numeric instability (log of very small numbers)
+	\item All built-in modules support CUDA
+	\item Custom modules (e.g. for reparametrization) required rewriting
+	\item CUDA uses single precision instead of double, leads to numeric instability
+	\item NVidia card necessary for CUDA (available on Amazon EC2 cloud)
 \end{itemize}
 
 \end{frame}
@@ -218,6 +221,7 @@ This approach prevents strides other than 1 and spatial max pooling. Although de
 Use a two-layer MLP with weight sharing to reconstruct the output. Each feature map ha its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
 \\ \vspace{4mm}
 This enables differences in spatial resolution in subsequent feature maps, but the factor between the two resolutions must be an integer.
+
 %This is somewhat restrictive, but rarely a problem
 
 %explain that the options have pros and cons, perhaps another slide on what worked best for a given architecture?
@@ -243,9 +247,8 @@ This enables differences in spatial resolution in subsequent feature maps, but t
 	\begin{itemize}
 		\item Without dimensionality reduction gives UNKNOWN - ALIEN - THERE ARE NO ANSWERS HERE
 		\item Dimensionality reduction using stride 2 leads to a lowerbound of -105 after convergence. This is similar to the result of the fully connected network of \cite{kingma2013stochastic}, with one third of the number of parameters and much faster convergence
-		\item Dimensionality reduction using Max Pooling converges to a slightly higher lowerbound of -106. Showing that it's slightly harder to invert this operation.
+		\item Dimensionality reduction using max pooling converges to a slightly higher lowerbound of -106. Showing that it's  harder to invert this operation.
 	\end{itemize}
-
 \end{frame}
 
 \section{Discussion}
