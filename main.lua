@@ -47,10 +47,9 @@ opfunc = function(batch)
     local f = model:forward(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
-    local target = batch:reshape(batchSize,total_output_size)
-	print(torch.norm(f:double()))
+    local target = batch:double():reshape(batchSize,total_output_size)
     local err = criterion:forward(f, target)
-	print(err)
+
     local df_dw = criterion:backward(f, target)
 
     model:backward(batch,df_dw)
@@ -72,7 +71,6 @@ opfunc = function(batch)
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
-    print(lowerbound/batch:size(1))
     local weights, grads = model:parameters()
 
     return weights, grads, lowerbound
