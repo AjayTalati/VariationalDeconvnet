@@ -188,6 +188,13 @@ model:add(nn.Linear(128,#classes))
 
 \begin{frame}
 \frametitle{How can we perform Deconvolution?}
+% here figure of network, onlt the deconvolution part
+%describe the problem of upsampling and weight sharing
+Option 1: for each resulting feature map, learn a weight matrix that creates an NxN window for each pixel in the feature maps of the previous layer.\\
+requirements:
+\begin{itemize}
+\item a stride equal to the filter size
+\end{itemize} 
 \end{frame}
 
 \section{Discussion}
