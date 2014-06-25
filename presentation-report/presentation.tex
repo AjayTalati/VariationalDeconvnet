@@ -1,95 +1,38 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Beamer Presentation
-% LaTeX Template
-% Version 1.0 (10/11/12)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND THEMES
-%----------------------------------------------------------------------------------------
-
 \documentclass{beamer}
 
 \mode<presentation> {
 
-% The Beamer class comes with a number of default slide themes
-% which change the colors and layouts of slides. Below this is a list
-% of all the themes, uncomment each in turn to see what they look like.
-
 %\usetheme{default}
-%\usetheme{AnnArbor}
-%\usetheme{Antibes}
-%\usetheme{Bergen}
-%\usetheme{Berkeley}
-%\usetheme{Berlin}
-%\usetheme{Boadilla}
-%\usetheme{CambridgeUS}
-%\usetheme{Copenhagen}
-%\usetheme{Darmstadt}
-%\usetheme{Dresden}
-%\usetheme{Frankfurt}
-%\usetheme{Goettingen}
-%\usetheme{Hannover}
-%\usetheme{Ilmenau}
-%\usetheme{JuanLesPins}
-%\usetheme{Luebeck}
-%\usetheme{Madrid}
-%\usetheme{Malmoe}
-%\usetheme{Marburg}
-%\usetheme{Montpellier}
-%\usetheme{PaloAlto}
-%\usetheme{Pittsburgh}
 \usetheme{Rochester}
-%\usetheme{Singapore}
-%\usetheme{Szeged}
-%\usetheme{Warsaw}
-
-% As well as themes, the Beamer class has a number of color themes
-% for any slide theme. Uncomment each of these in turn to see how it
-% changes the colors of your current slide theme.
-
-%\usecolortheme{albatross}
-%\usecolortheme{beaver}
-%\usecolortheme{beetle}
-%\usecolortheme{crane}
-%\usecolortheme{dolphin}
-%\usecolortheme{dove}
-%\usecolortheme{fly}
 \usecolortheme{lily}
-%\usecolortheme{orchid}
-%\usecolortheme{rose}
-%\usecolortheme{seagull}
-%\usecolortheme{seahorse}
-%\usecolortheme{whale}
-%\usecolortheme{wolverine}
 
-% \setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
-\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
-
-\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+\setbeamertemplate{footline}[page number] 
+\beamertemplatenavigationsymbolsempty
 \setbeamertemplate{bibliography item}{} %Remove icons in bibliography
 }
 
 \usepackage{graphicx} % Allows including images
-\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \usepackage{amsmath}
 \usepackage{lmodern}
+\usepackage{listings}
+
+\lstset{
+    language=[5.0]Lua,
+    basicstyle=\fontsize{11}{9},
+    sensitive=true,
+    breaklines=true,
+    tabsize=2
+}
+
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Project Learning Systems]{Unsupervised training of Convolutional Networks with SGVB} % The short title appears at the bottom of every slide, the full title is only on the title page
+\title[Project Learning Systems]{Unsupervised training of Convolutional Networks with SGVB} 
 
-\author{Joost van Amersfoort \& Otto Fabius} % Your name
-\institute[UvA] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+\author{Joost van Amersfoort \& Otto Fabius} 
+\institute[UvA] 
 {University of Amsterdam
 % Your institution for the title page
 \medskip
@@ -103,17 +46,16 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Overview} % Table of contents slide, comment this block out to remove it
-\tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\frametitle{Overview}
+\tableofcontents 
 \end{frame}
 
 %----------------------------------------------------------------------------------------
 %	PRESENTATION SLIDES
 %----------------------------------------------------------------------------------------
 
-%------------------------------------------------
-\section{Introduction} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
-%------------------------------------------------
+\section{Introduction}
+
 
 \begin{frame}
 \frametitle{Introduction}
@@ -129,10 +71,12 @@
 \subsection{Convolutional Neural Networks}
 \begin{frame}
 \frametitle{Convolutional Neural Networks - Error Backpropagation}
-The gradient of a convolution is relatively straightforward.\\ Let $L$ be the loss function, and $y = x$ \textasteriskcentered $k$ the convolution operation with weights $W$, then \\   
+The gradient of a convolution is relatively straightforward.\\ Let $L$ be the loss function, and $y = x * k$ the convolution operation with weights $W$, then \\   
+
 \begin{align*}
-\nabla_W L = (\nabla_y L) \ast x^T 
+\nabla_W L = (\nabla_y L) * x^T 
 \end{align*}
+
 \end{frame}
 
 \begin{frame}
@@ -183,8 +127,62 @@ We need to estimate (stochastic) gradients w.r.t the model parameters. For this,
 \section{Implementation}
 
 \subsection{Torch7}
+\begin{frame}
+\frametitle{Implementation using \href{http://torch.ch/}{Torch7}}
+\begin{itemize}
+	\item Torch7 is a framework on top of Lua, utilizing the LuaJIT and crucial parts are in C/CUDA code
+	\item Models in Torch7 consist of a stack of modules, e.g. Sigmoid, Linear and Convolution
+	\item A module consists roughly of three functions:
+		\begin{itemize}
+			\item updateInput, which defines how the input is updated
+			\item updateGradOutput, which defines how the gradient is updated during Backpropagation
+			\item AccGradParameters, which defines how the parameters of the module are updated, given the gradient
+		\end{itemize}
+\end{itemize}
+\end{frame}
 
-\subsection{GPU}
+\begin{frame}[fragile]
+\frametitle{Example of model in Torch7}
+\begin{lstlisting}
+require 'torch'
+require 'nn'
+model = nn.Sequential()
+
+-- stage 1 : standard convolution layer
+model:add(nn.SpatialConvolution(inputLayers, outputLayers, filterSizeW, filterSizeH))
+model:add(nn.SpatialMaxPooling(windowH, windowW, strideH, strideW))
+model:add(nn.Sigmoid())
+
+-- stage 2 : standard 2-layer neural network
+model:add(nn.Linear(256, 128))
+model:add(nn.Sigmoid())
+model:add(nn.Linear(128,#classes))
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example of model in Torch7}
+
+\begin{itemize}
+	\item Output of model can be used as input for a criterion, a seperate module
+	\item Criterion outputs the error (used for keeping track of lowerbound) and a gradient of the error w.r.t to the input
+	\item What rests is a simple \texttt{model:forward(batch)} and \texttt{model:backward(batch, error)}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Using the GPU with Torch7}
+
+\begin{itemize}
+	\item Fairly straight forward process, as long as all modules support CUDA
+	\item To get serious benefit, it was necessary to rewrite most code: instead of computation power, now memory is the scarce resource
+	\item Important notes: necessary to use specific CUDA modules and single precision instead of double leads to numeric instability (log of very small numbers)
+\end{itemize}
+
+\end{frame}
+
  
 \section{Results}
 
