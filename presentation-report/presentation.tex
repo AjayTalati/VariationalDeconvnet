@@ -62,7 +62,7 @@ Supervisor: Diederik Kingma
 	\item Convolutional Neural Networks (CNNs) have had much success recently in Computer Vision tasks, due to an increase in computing power and available annotated data and efficient GPU implementations
 	\item Currently there are no successful means of training such networks unsupervised
 	\item The recently developed SGVB makes efficient, effective Bayesian Inference possible by means of stochastic gradient descent. This can be used to train a CNN unsupervised
-	\item Could possibly use this for pretraining a CNN, but also creates a generative model which can be used for many different tasks (See Christos' presentation!)
+	\item Uses include pretraining a CNN, but a generative model can be used for many different tasks (See Christos' presentation!)
 \end{itemize}
 \end{frame}
 
@@ -73,7 +73,8 @@ Supervisor: Diederik Kingma
 \begin{frame}
 \frametitle{Convolutional Neural Networks - Example structure}
 
-\includegraphics[scale = 0.7]{img/convnet.png} \\cite{farabet2014}
+\includegraphics[scale = 0.7]{img/convnet.png} 
+\cite{farabet2014}
 
 \end{frame}
 
@@ -99,8 +100,8 @@ Supervisor: Diederik Kingma
 \begin{frame}
 \frametitle{Unsupervised Training with SGVB}
 %image of example structure with latent variables and deconvolution
-Model $P(\mathbf{X},\mathbf{Z}) = \dfrac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$.
-Here, $P(\mathbf{X}|\mathbf{Z})$ is the deconvolutional layer and the intractable $P(\mathbf{Z}|\mathbf{X})$ is approximated by $q(\mathbf{Z}|\mathbf{X})$, which is the Convolutional layer.
+Model $P(\mathbf{X},\mathbf{Z}) = \dfrac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \vspace{0.5mm}
+Here, the intractable $P(\mathbf{Z}|\mathbf{X})$ is approximated by $q(\mathbf{Z}|\mathbf{X})$ with the Convolutional part of the network (encoder). $P(\mathbf{X}|\mathbf{Z})$ is the modeled by the Deconvolutional part of the network (decoder).
 
 \end{frame}
 
@@ -120,7 +121,7 @@ P(\mathbf{X}) = \int_z P(\mathbf{Z})P(\mathbf{X}|\mathbf{Z})d\mathbf{Z}$
 
 \begin{frame}
 \frametitle{Reparameterization}
-We need to estimate (stochastic) gradients w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now if we sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$, $logp_{\theta}(\mathbf{X})$ is fully differentiable and we can perform stochastic gradient descent on the model parameters!
+We need to estimate (stochastic) gradients of the lower bound w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now if we sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$, $logp_{\theta}(\mathbf{X})$ is fully differentiable and we can perform stochastic gradient descent on the model parameters!
 \end{frame}
 
 
@@ -142,7 +143,7 @@ We need to estimate (stochastic) gradients w.r.t the model parameters. For this,
 \begin{itemize}
 	\item Torch7 is a framework on top of Lua, utilizing the LuaJIT and crucial parts are in C/CUDA code
 	\item Models in Torch7 consist of a stack of modules (layers), e.g. Sigmoid, Linear and Convolution
-	\item A module consists roughly of three functions:
+	\item Each module consists roughly of three functions:
 		\begin{itemize}
 			\item updateInput, which defines how the input is updated
 			\item updateGradOutput, which defines how the gradient is updated during Backpropagation
@@ -159,15 +160,15 @@ require 'nn'
 
 model = nn.Sequential()
 
--- stage 1 : standard convolution layer
+-- layer 1 : standard convolutional layer
 model:add(nn.SpatialConvolution(1, 16, 5, 5))
 model:add(nn.SpatialMaxPooling(2, 2, 2, 2))
 model:add(nn.Sigmoid())
 
--- stage 2 : standard 2-layer neural network
-model:add(nn.Linear(256, 128))
+-- layer 2 : standard fully connected layer
+model:add(nn.Linear(256, #classes))
 model:add(nn.Sigmoid())
-model:add(nn.Linear(128,#classes))
+
 \end{lstlisting}
 \end{frame}
 
@@ -217,9 +218,11 @@ model:add(nn.Linear(128,#classes))
 \begin{frame}
 \frametitle{How can we perform Deconvolution? - Option 1}
 % here figure of network, only the deconvolution part
-Both the encoding layer and decoding layer consist of a convolution with $K$ $NxN$ filters with stride 1, after zero padding to keep the dimensions of the feature maps the same. \\ \vspace{4mm}
-This approach prevents strides other than 1 and spatial max pooling. Although deeper networks often contain such layers, spatial max pooling or strides are desirable in ConvNets for multiple reasons and thus we need another method for deconvolution.
-
+\begin{itemize}
+\item Convolution with $K$ $NxN$ filters for both encoding and decoding
+\item Necessary to use stride 1 and zero padding to keep the same dimensions.
+\end{itemize}  \vspace{4mm}
+Although deeper networks often contain such layers, spatial max pooling or strides are desirable in ConvNets for multiple reasons and thus we need another method for deconvolution.
 % explain why this is restrictive
 \end{frame}
 
