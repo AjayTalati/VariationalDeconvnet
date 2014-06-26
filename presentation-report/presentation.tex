@@ -59,7 +59,7 @@ Supervisor: Diederik Kingma
 \begin{frame}
 \frametitle{Introduction}
 \begin{itemize}
-	\item Convolutional Neural Networks (CNNs) have had much success recently in Computer Vision tasks, due to an increase in computing power and available annotated data and efficient GPU implementations
+	\item Convolutional Neural Networks (CNNs) have had much success recently in Computer Vision tasks \cite{krizhevsky2012imagenet} \cite{sermanet2013overfeat}, due to an increase in computing power and available annotated data and efficient GPU implementations
 	\item Currently there are no successful means of training such networks unsupervised
 	\item The recently developed SGVB makes efficient, effective Bayesian Inference possible by means of stochastic gradient descent. This can be used to train a CNN unsupervised
 	\item Uses include pretraining a CNN, but a generative model can be used for many different tasks (See Christos' presentation!)
@@ -231,23 +231,22 @@ Although deeper networks often contain such layers, spatial max pooling or strid
 
 \begin{frame}
 \frametitle{How can we perform Deconvolution? - Option 2}
-%an image here would be simply awesome, otherwise we should probably draw this on the whiteboard.
 
 \begin{itemize}
 \item The encoding layer consists of a convolution with $K$ $NxN$ filters.
 \item Use a two-layer MLP with weight sharing in the decoder: Each feature map has its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
 \item This makes it possible to do max-pooling or use strides, and do up-sampling in de deconvolutional layer. The factor between two resolutions must be an integer.
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example of option 2}
+\includegraphics[scale = 0.22]{img/example2.png} 
+\end{frame}
 
 %This is somewhat restrictive, but rarely a problem
 
 %Dimesionality of hidden units has to be chosen such that the amount of weights is similar the convolution layer
-
-\end{frame}
-
-\begin{frame}
-Placeholder for visualization of option 2
-\end{frame}
 
 \begin{frame}
 \frametitle{One layer architectures}
