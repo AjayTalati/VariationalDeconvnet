@@ -218,6 +218,8 @@ model:add(nn.Sigmoid())
 \begin{frame}
 \frametitle{How can we perform Deconvolution? - Option 1}
 % here figure of network, only the deconvolution part
+\includegraphics[scale = 0.22]{img/example1.png} 
+
 \begin{itemize}
 \item Convolution with $K$ $NxN$ filters for both encoding and decoding
 \item Necessary to use stride 1 and zero padding to keep the same dimensions.
@@ -225,6 +227,7 @@ model:add(nn.Sigmoid())
 Although deeper networks often contain such layers, spatial max pooling or strides are desirable in ConvNets for multiple reasons and thus we need another method for deconvolution.
 % explain why this is restrictive
 \end{frame}
+
 
 \begin{frame}
 \frametitle{How can we perform Deconvolution? - Option 2}
