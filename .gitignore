@@ -11,4 +11,6 @@ model
 *.nav
 *.snm
 *.toc
+*.bbl
+*.blg
 *.aux
