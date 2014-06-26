@@ -121,7 +121,7 @@ P(\mathbf{X}) = \int_z P(\mathbf{Z})P(\mathbf{X}|\mathbf{Z})d\mathbf{Z}$
 
 \begin{frame}
 \frametitle{Reparameterization}
-We need to estimate (stochastic) gradients of the lower bound w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now if we sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$, $logp_{\theta}(\mathbf{X})$ is fully differentiable and we can perform stochastic gradient descent on the model parameters!
+We need to estimate (stochastic) gradients of the lower bound w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now if we sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$, $\mathcal{L}(\mathbf{\theta}, \mathbf{\phi}; \mathbf{X})$ is fully differentiable and we can perform stochastic gradient descent on the model parameters!
 \end{frame}
 
 
@@ -268,7 +268,7 @@ With input size 28x28 (MNIST), the feature map sizes of layer 1 and 2 could for 
 \item 7-7
 \end{itemize}
 Typically, \#feature maps increases and the spatial resolution decreases. This way, the number of parameters per layer is roughly equal. \\
-Default filters are 5x5 but should be larger is the spatial resolution is higher. \\
+Default filters are 5x5 but could be larger if the spatial resolution is higher. \\
 Of course, three layers (or even more) is also possible.
 \end{frame}
 
@@ -286,10 +286,15 @@ Of course, three layers (or even more) is also possible.
 
 
 % %-----------------------------------------------
-\begin{frame}{Bibliography}
+\begin{frame}[shrink=20]{Bibliography}
 	\nocite{*}
 	\bibliographystyle{ieeetr}
 	\bibliography{ref}
+\end{frame}
+
+\begin{frame}
+\frametitle{lower bound graph}
+\includegraphics[scale=0.4]{img/graph.png}
 \end{frame}
 
 %------------------------------------------------
