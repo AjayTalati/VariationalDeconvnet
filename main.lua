@@ -151,7 +151,7 @@ while true do
     end
 
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
-    if opt.tijgerprint == 'hell yeah!!' then print 'He Tijgertje :)'
+    if opt.tijgerprint == 'hell yeah!!' then print('He Tijgertje :)')
     if lowerboundlist then
         lowerboundlist = torch.cat(lowerboundlist,torch.Tensor(1,1):fill(lowerbound/N),1)
     else
