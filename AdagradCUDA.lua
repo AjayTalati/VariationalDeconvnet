@@ -8,7 +8,7 @@ function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
         for j=1,#grads do            
             if h[j] == nil then
                 h[j] = grads[j]:clone()
-                h[j]:cmul(grads[j]):add(0.01)
+                h[j]:cmul(grads[j]):add(10)
             else
                 h[j]:add(grads[j]:pow(2))
             end

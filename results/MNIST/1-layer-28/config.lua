@@ -1,7 +1,7 @@
 batchSize = 100 -- size of mini-batches
-learningRate = 0.03 -- Learning rate used in AdaGrad
+learningRate = 0.05 -- Learning rate used in AdaGrad
 
-initrounds = 20 -- Amount of intialization rounds in AdaGrad
+initrounds = 100 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000 -- Size of training set
 tesize = 10000 -- Size of test set

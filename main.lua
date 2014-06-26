@@ -45,6 +45,7 @@ KLD = nn.KLDCriterion()
 opfunc = function(batch) 
     model:zeroGradParameters()
     local f = model:forward(batch)
+    print("f",torch.norm(f))
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
     local target = batch:double():reshape(batchSize,total_output_size)
@@ -71,6 +72,10 @@ opfunc = function(batch)
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
+    print("BCE",err/batch:size(1))
+    print("KLD", KLDerr/batch:size(1))
+    print("lowerbound", lowerbound/batch:size(1))
+    
     local weights, grads = model:parameters()
 
     return weights, grads, lowerbound
