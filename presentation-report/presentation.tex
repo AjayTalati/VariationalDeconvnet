@@ -223,11 +223,11 @@ Although deeper networks often contain such layers, spatial max pooling or strid
 \frametitle{How can we perform Deconvolution? - Option 2}
 %an image here would be simply awesome, otherwise we should probably draw this on the whiteboard.
 
-The encoding layer consists of a convolution with $K$ $NxN$ filters and a stride higher than 1 or a max pooling layer.
-\\ \vspace{4mm}
-To invert the dimensionality reduction, it is possible to use a two-layer MLP with weight sharing to reconstruct the output. Each feature map has its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
-\\ \vspace{4mm}
-This makes it possible to do upsampling, but the factor between two resolutions must be an integer
+\begin{itemize}
+\item The encoding layer consists of a convolution with $K$ $NxN$ filters.
+\item Use a two-layer MLP with weight sharing in the decoder: Each feature map has its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
+\item This makes it possible to do max-pooling or use strides, and do up-sampling in de deconvolutional layer. The factor between two resolutions must be an integer.
+\end{itemize}
 
 %This is somewhat restrictive, but rarely a problem
 
@@ -245,7 +245,7 @@ Placeholder for visualization of option 2
 \begin{itemize}
 	\item For one layer networks we can choose between option 1 and 2
 	\item Option 1 gives UNKNOWN - ALIEN - THERE ARE NO ANSWERS HERE
-	\item Dimensionality reduction using stride 2 leads to a lowerbound of -105 after convergence. This is similar to the result of the fully connected network of \cite{kingma2013stochastic}, with one third of the number of parameters and much faster convergence
+	\item Dimensionality reduction using stride 2 leads to a lower bound of -105 after convergence. This is similar to the result of the fully connected network of \cite{kingma2013stochastic}, with one third of the number of parameters and much faster convergence
 	\item Dimensionality reduction using max pooling converges to a slightly higher lowerbound of -106. Showing that it's  harder to invert this operation.
 	\end{itemize}
 \end{frame}
@@ -258,17 +258,17 @@ With input size 28x28 (MNIST), the feature map sizes of layer 1 and 2 could for 
 \item 14-14
 \item 7-7
 \end{itemize}
-Usually the number of feature maps increases with the decrease in spatial resolution, e/g 16 and 32 feature maps for layers 1 and 2 respectively. This way, the number of parameters per layer is rougly equal. \\
-Default filters are 5x5 but should be larger is the spatial resolution is higher, e.g. when training on high resolution images. \\
+Typically, \#feature maps increases and the spatial resolution decreases. This way, the number of parameters per layer is roughly equal. \\
+Default filters are 5x5 but should be larger is the spatial resolution is higher. \\
 Of course, three layers (or even more) is also possible.
 \end{frame}
 
 \begin{frame}
 \frametitle{Discussion}
 	\begin{itemize}
-		\item First results are somewhat promising, indicationg that this could be a very useful approach
+		\item First results are somewhat promising, indicating that this could be a very useful approach
 		\item Not many results yet due to problems during training.
-		\item There are moore options to be explored, such as latent variables in intermediate layers and other methods for Deconvolution
+		\item There are more options to be explored, such as latent variables in intermediate layers and other methods for Deconvolution
 		\item It would be interesting to see if and how pretraining ConvNets with SGVB can boost supervised learning.
 	\end{itemize}
 \end{frame}
