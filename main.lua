@@ -24,6 +24,7 @@ cmd:option('-continue', false, 'load parameters from earlier training')
 cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
 cmd:option('tijgerprint', 'hell yeah!!', 'adds tijgerpirnt')
 cmd:option('-verbose', false, 'add verbosity, loooots of prints')
+cmd:option('-cuda', false, 'use CUDA modules')
 
 cmd:text()
 opt = cmd:parse(arg)
@@ -73,7 +74,7 @@ opfunc = function(batch)
 
     local lowerbound = err  + KLDerr
 
-    if verbose then
+    if opt.verbose then
         print("BCE",err/batch:size(1))
         print("KLD", KLDerr/batch:size(1))
         print("lowerbound", lowerbound/batch:size(1))

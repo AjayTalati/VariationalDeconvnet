@@ -39,11 +39,9 @@ encoder:add(z)
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,0))
-
 decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
 decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolution(feature_maps,feature_maps,filter_size,filter_size,stride,stride))
-
 decoder:add(nn.Sum(2))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
