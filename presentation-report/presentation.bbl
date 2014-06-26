@@ -1,0 +1,10 @@
+\begin{thebibliography}{1}
+
+\bibitem{farabet2014}
+C.~Farabet, ``Machine learning with torch7,'' Feb. 2014.
+
+\bibitem{kingma2013stochastic}
+D.~P. Kingma and M.~Welling, ``Stochastic gradient vb and the variational
+  auto-encoder,'' {\em ArXiv e-prints (Dec. 2013). arX iv}, vol.~1312.
+
+\end{thebibliography}

@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: presentation.aux
+The style file: ieeetr.bst
+Database file #1: ref.bib
+Warning--entry type for "farabet2014" isn't style-file defined
+--line 8 of file ref.bib
+Warning--empty year in kingma2013stochastic
+You've used 2 entries,
+            1876 wiz_defined-function locations,
+            486 strings with 3684 characters,
+and the built_in function-call counts, 300 in all, are:
+= -- 22
+> -- 12
+< -- 0
++ -- 5
+- -- 3
+* -- 21
+:= -- 53
+add.period$ -- 2
+call.type$ -- 2
+change.case$ -- 2
+chr.to.int$ -- 0
+cite$ -- 3
+duplicate$ -- 13
+empty$ -- 36
+format.name$ -- 3
+if$ -- 67
+int.to.chr$ -- 0
+int.to.str$ -- 2
+missing$ -- 1
+newline$ -- 9
+num.names$ -- 2
+pop$ -- 11
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 6
+stack$ -- 0
+substring$ -- 0
+swap$ -- 1
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 1
+while$ -- 2
+width$ -- 3
+write$ -- 17
+(There were 2 warnings)
