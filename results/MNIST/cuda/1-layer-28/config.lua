@@ -5,7 +5,7 @@ require 'SpatialZeroPaddingCUDA'
 cuda = true
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.02 -- Learning rate used in AdaGrad
+learningRate = 0.005 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -54,9 +54,9 @@ decoder:add(nn.Threshold(0,1e-6))
 
 decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
 decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
-decoder:add(nn.SpatialConvolution(feature_maps,colorchannels,filter_size,filter_size,stride,stride))
+decoder:add(nn.SpatialConvolution(feature_maps,feature_maps,filter_size,filter_size,stride,stride))
 
-
+decoder:add(nn.Sum(2))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 

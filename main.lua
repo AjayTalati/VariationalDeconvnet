@@ -23,6 +23,7 @@ cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments
 cmd:option('-continue', false, 'load parameters from earlier training')
 cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
 cmd:option('tijgerprint', 'hell yeah!!', 'adds tijgerpirnt')
+cmd:option('-verbose', false, 'add verbosity, loooots of prints')
 
 cmd:text()
 opt = cmd:parse(arg)
@@ -45,7 +46,6 @@ KLD = nn.KLDCriterion()
 opfunc = function(batch) 
     model:zeroGradParameters()
     local f = model:forward(batch)
-    print("f",torch.norm(f))
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
     local target = batch:double():reshape(batchSize,total_output_size)
@@ -72,9 +72,12 @@ opfunc = function(batch)
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
-    print("BCE",err/batch:size(1))
-    print("KLD", KLDerr/batch:size(1))
-    print("lowerbound", lowerbound/batch:size(1))
+
+    if verbose then
+        print("BCE",err/batch:size(1))
+        print("KLD", KLDerr/batch:size(1))
+        print("lowerbound", lowerbound/batch:size(1))
+    end
     
     local weights, grads = model:parameters()
 
@@ -156,7 +159,7 @@ while true do
     end
 
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
-    if opt.tijgerprint == 'hell yeah!!' then print('He Tijgertje :)')
+    if opt.tijgerprint == 'hell yeah!!' then print('He Tijgertje :)') end
     if lowerboundlist then
         lowerboundlist = torch.cat(lowerboundlist,torch.Tensor(1,1):fill(lowerbound/N),1)
     else

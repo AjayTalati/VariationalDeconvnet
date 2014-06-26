@@ -1,7 +1,7 @@
 batchSize = 100 -- size of mini-batches
-learningRate = 0.05 -- Learning rate used in AdaGrad
+learningRate = 0.005 -- Learning rate used in AdaGrad
 
-initrounds = 100 -- Amount of intialization rounds in AdaGrad
+initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000 -- Size of training set
 tesize = 10000 -- Size of test set
@@ -39,9 +39,11 @@ encoder:add(z)
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size))
 decoder:add(nn.Threshold(0,0))
+
 decoder:add(nn.Reshape(batchSize,feature_maps,input_size,input_size))
 decoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 decoder:add(nn.SpatialConvolution(feature_maps,feature_maps,filter_size,filter_size,stride,stride))
+
 decoder:add(nn.Sum(2))
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))

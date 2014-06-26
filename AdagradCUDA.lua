@@ -1,5 +1,6 @@
 function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
     local h = {}
+    print("Running AdaGrad init")
     for i = 1, batchSize*adaGradInitRounds+1, batchSize do
         local batch = data[{{i,i+batchSize-1}}]
 
@@ -8,7 +9,7 @@ function adaGradInit(data, opfunc, batchSize, adaGradInitRounds)
         for j=1,#grads do            
             if h[j] == nil then
                 h[j] = grads[j]:clone()
-                h[j]:cmul(grads[j]):add(10)
+                h[j]:cmul(grads[j]):add(1)
             else
                 h[j]:add(grads[j]:pow(2))
             end
