@@ -80,11 +80,17 @@ Supervisor: Diederik Kingma
 
 \begin{frame}
 \frametitle{Convolutional Neural Networks - Error Backpropagation}
-The gradient of a convolution is relatively straightforward.\\ Let $L$ be the loss function, and $y = x * k$ the convolution operation with weights $W$, then \\   
+
+\begin{itemize}
+
+\item Backpropagation works as expected
+\item The gradient of a convolution is relatively straightforward.\\ Let $L$ be the loss function, and $y = x * k$ the convolution operation with weights $W$, then \\   
 
 \begin{align*}
 \nabla_W L = (\nabla_y L) * x^T 
 \end{align*}
+
+\end{itemize}
 
 \end{frame}
 
@@ -94,8 +100,9 @@ The gradient of a convolution is relatively straightforward.\\ Let $L$ be the lo
 \begin{frame}
 \frametitle{Unsupervised Training with SGVB}
 %image of example structure with latent variables and deconvolution
-Model $P(\mathbf{X},\mathbf{Z}) = \frac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \vspace{0.5mm}
+Model $P(\mathbf{X},\mathbf{Z}) = \dfrac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \vspace{0.5mm}
 Here, the intractable $P(\mathbf{Z}|\mathbf{X})$ is approximated by $q(\mathbf{Z}|\mathbf{X})$ with the Convolutional part of the network (encoder). $P(\mathbf{X}|\mathbf{Z})$ is the modeled by the Deconvolutional part of the network (decoder).
+
 \end{frame}
 
 \begin{frame}
