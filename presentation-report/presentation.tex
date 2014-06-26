@@ -32,7 +32,7 @@
 
 \author{Joost van Amersfoort \& Otto Fabius} 
 \institute[UvA] 
-{University of Amsterdam
+{University of Amsterdam \\
 Supervisor: Diederik Kingma
 \medskip
 }
@@ -59,15 +59,24 @@ Supervisor: Diederik Kingma
 \begin{frame}
 \frametitle{Introduction}
 \begin{itemize}
-	\item Convolutional Networks have had much success recently in Computer Vision tasks, due to an increase in computing power and available annotated data and efficient GPU implementations
-	\item Currently there are no successful means of training such networks unsupervised has been reported
-	\item The recently developed SGVB makes efficient, effective Bayesian Inference possible by means of stochastic gradient descent. This can be used to train a Convolution Neural Network unsupervised
+	\item Convolutional Neural Networks (CNNs) have had much success recently in Computer Vision tasks, due to an increase in computing power and available annotated data and efficient GPU implementations
+	\item Currently there are no successful means of training such networks unsupervised
+	\item The recently developed SGVB makes efficient, effective Bayesian Inference possible by means of stochastic gradient descent. This can be used to train a CNN unsupervised
+	\item Could possibly use this for pretraining a CNN, but also creates a generative model which can be used for many different tasks (See Christos' presentation!)
 \end{itemize}
 \end{frame}
 
 \section{Theory}
 
 \subsection{Convolutional Neural Networks}
+
+\begin{frame}
+\frametitle{Convolutional Neural Networks - Example structure}
+
+\includegraphics[scale = 0.7]{img/convnet.png} \\cite{farabet2014}
+
+\end{frame}
+
 \begin{frame}
 \frametitle{Convolutional Neural Networks - Error Backpropagation}
 The gradient of a convolution is relatively straightforward.\\ Let $L$ be the loss function, and $y = x * k$ the convolution operation with weights $W$, then \\   
@@ -78,14 +87,7 @@ The gradient of a convolution is relatively straightforward.\\ Let $L$ be the lo
 
 \end{frame}
 
-\begin{frame}
-\frametitle{Convolutional Neural Networks - Example structure}
 
-\includegraphics[scale = 0.7]{img/convnet.png} \\\cite{farabet2014}
-
-%image of example structure
-%tell something about need for computational resources
-\end{frame}
 
 \subsection{SGVB}
 \begin{frame}
@@ -93,7 +95,7 @@ The gradient of a convolution is relatively straightforward.\\ Let $L$ be the lo
 %image of example structure with latent variables and deconvolution
 Model $P(\mathbf{X},\mathbf{Z}) = \frac{P(\mathbf{Z})\cdot P(\mathbf{X}|\mathbf{Z})}{P(\mathbf{Z}|\mathbf{X})}$ to find structure in data $\mathbf{X}$. \vspace{0.5mm}
 Here, $P(\mathbf{X}|\mathbf{Z})$ is the deconvolutional layer and the intractable $P(\mathbf{Z}|\mathbf{X})$ is approximated by $q(\mathbf{Z}|\mathbf{X})$, which is the Convolutional layer.
-%mention that we need to train the parameters of the network and that we can use this for pretraining an convnet, but also have a generative model which can be used for many different tasks.
+
 \end{frame}
 
 \begin{frame}
@@ -114,6 +116,7 @@ P(\mathbf{X}) = \int_z P(\mathbf{Z})P(\mathbf{X}|\mathbf{Z})d\mathbf{Z}$
 \frametitle{Reparameterization}
 We need to estimate (stochastic) gradients w.r.t the model parameters. For this, we reparameterize $q(\mathbf{Z}|\mathbf{X})$ as a differentiable, deterministic function $g_{\theta}(\epsilon,\mathbf{x})$, which depends on sampled noise $\epsilon \sim N(0,1)$. \\ Now if we sample $\tilde{z} \sim q(\mathbf{Z}|\mathbf{X})$, $logp_{\theta}(\mathbf{X})$ is fully differentiable and we can perform stochastic gradient descent on the model parameters!
 \end{frame}
+
 
 \section{Research Questions}
 \begin{frame}
@@ -181,7 +184,7 @@ model:add(nn.Linear(128,#classes))
 	\item All built-in modules support CUDA
 	\item Custom modules (e.g. for reparametrization) required rewriting
 	\item CUDA uses single precision instead of double, leads to numeric instability
-	\item NVidia card necessary for CUDA (available on Amazon EC2 cloud)
+	\item NVidia card necessary for CUDA (available for rent on Amazon EC2 cloud)
 \end{itemize}
 
 \end{frame}
@@ -218,36 +221,53 @@ This approach prevents strides other than 1 and spatial max pooling. Although de
 \frametitle{How can we perform Deconvolution? - Option 2}
 %an image here would be simply awesome, otherwise we should probably draw this on the whiteboard.
 
-Use a two-layer MLP with weight sharing to reconstruct the output. Each feature map ha its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
+The encoding layer consists of a convolution with $K$ $NxN$ filters and a stride higher than 1 or a max pooling layer.
 \\ \vspace{4mm}
-This enables differences in spatial resolution in subsequent feature maps, but the factor between the two resolutions must be an integer.
+To invert the dimensionality reduction, it is possible to use a two-layer MLP with weight sharing to reconstruct the output. Each feature map has its own set of weights, one for each unit in the hidden layer. Similarly, the hidden layer connects to the output with the same weight from each hidden unit to all pixels in a given feature map.
+\\ \vspace{4mm}
+This makes it possible to do upsampling, but the factor between two resolutions must be an integer
 
 %This is somewhat restrictive, but rarely a problem
 
-%explain that the options have pros and cons, perhaps another slide on what worked best for a given architecture?
+%Dimesionality of hidden units has to be chosen such that the amount of weights is similar the convolution layer
+
 \end{frame}
 
 \begin{frame}
-\frametitle{Possible one layer architectures}
+Placeholder for visualization of option 2
+\end{frame}
+
+\begin{frame}
+\frametitle{One layer architectures}
 
 \begin{itemize}
-	\item For one layer networks there are two options: with and without dimensionality reduction
-	\item In an architecture without dimensionality reduction we perform zero padding with filter size - 1 before convolution. 
-		\begin{itemize}
-			\item Both encoder and decoder consist of padding and convolution layer
-		\end{itemize}
-	\item In an architecture with dimensionality reduction we use a convolution with a stride higher than 1 or a max 
-	pooling layer
-\end{itemize}
-
+	\item For one layer networks we can choose between option 1 and 2
+	\item Option 1 gives UNKNOWN - ALIEN - THERE ARE NO ANSWERS HERE
+	\item Dimensionality reduction using stride 2 leads to a lowerbound of -105 after convergence. This is similar to the result of the fully connected network of \cite{kingma2013stochastic}, with one third of the number of parameters and much faster convergence
+	\item Dimensionality reduction using max pooling converges to a slightly higher lowerbound of -106. Showing that it's  harder to invert this operation.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Results of one layer architectures}
+\frametitle{Multi-layer architectures}
+With input size 28x28 (MNIST), the feature map sizes of layer 1 and 2 could for example be:
+\begin{itemize}
+\item 14-7 
+\item 14-14
+\item 7-7
+\end{itemize}
+Usually the number of feature maps increases with the decrease in spatial resolution, e/g 16 and 32 feature maps for layers 1 and 2 respectively. This way, the number of parameters per layer is rougly equal. \\
+Default filters are 5x5 but should be larger is the spatial resolution is higher, e.g. when training on high resolution images. \\
+Of course, three layers (or even more) is also possible.
+\end{frame}
+
+\begin{frame}
+\frametitle{Discussion}
 	\begin{itemize}
-		\item Without dimensionality reduction gives UNKNOWN - ALIEN - THERE ARE NO ANSWERS HERE
-		\item Dimensionality reduction using stride 2 leads to a lowerbound of -105 after convergence. This is similar to the result of the fully connected network of \cite{kingma2013stochastic}, with one third of the number of parameters and much faster convergence
-		\item Dimensionality reduction using max pooling converges to a slightly higher lowerbound of -106. Showing that it's  harder to invert this operation.
+		\item First results are somewhat promising, indicationg that this could be a very useful approach
+		\item Not many results yet due to problems during training.
+		\item There are moore options to be explored, such as latent variables in intermediate layers and other methods for Deconvolution
+		\item It would be interesting to see if and how pretraining ConvNets with SGVB can boost supervised learning.
 	\end{itemize}
 \end{frame}
 
