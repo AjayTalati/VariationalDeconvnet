@@ -6,7 +6,7 @@ require 'nn'
 require 'LinearCR'
 require 'Reparametrize'
 require 'SpatialDeconvolution'
-require 'SpatialZeroPaddingC'
+
 require 'load'
 
 gfx = require 'gfx.js'
@@ -17,17 +17,17 @@ gfx = require 'gfx.js'
 
 ------------------------------------------------------------------------------------------------------------
 
-fname = 'results/MNIST/1-layer-doublepadding'
+fname = 'results/MNIST/1-layer-14'
 require (fname .. '/config')
 
  
 ------------------------------------------------------------------------------------------------------------
 
-model = torch.load(fname .. '/model')
+--model = torch.load(fname .. '/model')
 
-trainData, testData = loadMnist(trsize,tesize)
-data = testData.data[{{1,100},{},{},{}}]
-weights, gradients = model:getParameters()
+--trainData, testData = loadMnist(trsize,tesize)
+--data = testData.data[{{1,100},{},{},{}}]
+--weights, gradients = model:getParameters()
 
 function display_reconstruction(input)	
 	f = model:forward(input)
