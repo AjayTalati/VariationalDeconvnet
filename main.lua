@@ -22,7 +22,7 @@ cmd:text('Options:')
 cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments in')
 cmd:option('-continue', false, 'load parameters from earlier training')
 cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
-
+cmd:option('tijgerprint', 'hell yeah!!', 'adds tijgerpirnt')
 
 cmd:text()
 opt = cmd:parse(arg)
@@ -151,7 +151,7 @@ while true do
     end
 
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
-
+    if opt.tijgerprint == 'hell yeah!!' then print 'He Tijgertje :)'
     if lowerboundlist then
         lowerboundlist = torch.cat(lowerboundlist,torch.Tensor(1,1):fill(lowerbound/N),1)
     else
