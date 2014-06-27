@@ -1,0 +1,52 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{algorithm, algpseudocode}
+
+% commands used in algorithms
+\algnewcommand{\Input}[1]{%
+  \State \textbf{Inputs:}
+  \Statex \hspace*{\algorithmicindent}\parbox[t]{.8\linewidth}{\raggedright #1}
+}
+\algnewcommand{\Initialize}[1]{%
+  \State \textbf{Initialize:}
+  \Statex \hspace*{\algorithmicindent}\parbox[t]{.8\linewidth}{\raggedright #1}
+}
+
+\title{SGVB ConvNets}
+
+\author{Joost van Amersfoort \\ \\ Learning Systems Project \and Otto Fabius \\ \\ Supervised by Durk Kingma}
+
+\begin{document}
+
+\maketitle
+\hspace{25mm} Learning Systems Project\hspace{20mm} Supervised by Durk Kingma
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\input{sections/intro}
+
+\section{Implementation}\label{implementation}
+\input{sections/implementation}
+
+\section{Model Specifics}\label{model_specs}
+\input{sections/model_specs}
+
+\section{Results}\label{results}
+\input{sections/results}
+
+\section{Discussion and Future Work}\label{discussion}
+\input{sections/discussion}
+
+\section{Conclusion}\label{conclusion}
+\input{sections/conclusion}
+
+\pagebreak 
+\nocite{*}
+\bibliographystyle{amsplain}
+\bibliography{ref}
+
+\end{document}

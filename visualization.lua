@@ -17,8 +17,8 @@ gfx = require 'gfx.js'
 
 ------------------------------------------------------------------------------------------------------------
 
-fname = 'results/MNIST/1-layer-14'
-require (fname .. '/config')
+fname = 'results/MNIST/cuda/1-layer-28'
+--require (fname .. '/config')
 
  
 ------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ require (fname .. '/config')
 
 function display_reconstruction(input)	
 	f = model:forward(input)
-	print('hoi')
 		for i = 1,10 do
 		reconstruction = f[{{i},{}}]
 		target = input[{{i},{},{},{}}]
@@ -51,16 +50,16 @@ end
 
 function plot_lowerbound() -- add testlowerbound later
 	lowerbound = torch.load(fname .. '/lowerbound.t7')
-	--lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
-	values = 	  torch.Tensor(lowerbound:size(1)	 -0,2)
-	--values_test = torch.Tensor(lowerbound_test:size(1)-1,2)
+	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
+	values = 	  torch.Tensor(lowerbound:size(1)	  ,2)
+	values_test = torch.Tensor(lowerbound_test:size(1),2)
 	values[{{},{2}}] 	  = lowerbound[{{1,lowerbound:size(1)}}]
-	--values_test[{{},{2}}] = lowerbound_test[{{2,lowerbound_test:size(1)}}]
-	values[{{},{1}}] 	  = torch.linspace(0,50000*lowerbound:size(1)-0,lowerbound:size(1)-0)
-	--values_test[{{},{1}}] = torch.linspace(0,250000*lowerbound_test:size(1)-1,lowerbound_test:size(1)-1)
+	values_test[{{},{2}}] = lowerbound_test[{{1,lowerbound_test:size(1)}}]
+	values[{{},{1}}] 	  = torch.linspace(0,50000*lowerbound:size(1),lowerbound:size(1))
+	values_test[{{},{1}}] = torch.linspace(0,250000*lowerbound_test:size(1),lowerbound_test:size(1))
 
-	--gfx.chart({ values, values_test },{chart = 'line'})
-	gfx.chart({ values },{chart = 'line'})
+	gfx.chart({ values, values_test },{chart = 'line'})
+	--gfx.chart({ values },{chart = 'line'})
 
 end
 
