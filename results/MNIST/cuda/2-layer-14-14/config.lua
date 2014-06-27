@@ -1,13 +1,13 @@
-require 'cutorch'
-require 'cunn'
+--require 'cutorch'
+--require 'cunn'
 require 'SpatialZeroPaddingCUDA'
 
-cuda = true
+cuda = false
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.005 -- Learning rate used in AdaGrad
+learningRate = 0.01 -- Learning rate used in AdaGrad
 
-initrounds = 20 -- Amount of intialization rounds in AdaGrad
+initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
@@ -16,8 +16,10 @@ tesize = 10000-16 -- Size of test set
 -- trainData is table with field 'data' which contains the data
 trainData, testData = loadMnist(trsize,tesize)
 
-trainData.data = trainData.data:cuda()
-testData.data = testData.data:cuda()
+if cuda then
+	trainData.data = trainData.data:cuda()
+	testData.data = testData.data:cuda()
+end
 
 -- Model Specific parameters
 filter_size = 5
@@ -31,7 +33,7 @@ pad_2 = (filter_size_2-1)/2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
-feature_maps_2 = feature_maps*2
+feature_maps_2 = 16
 factor = 2
 
 map_size = 14
@@ -110,7 +112,9 @@ model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
-model:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
 
-encoder:cuda()
-decoder:cuda()
+if cuda then
+	model:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
+	encoder:cuda()
+	decoder:cuda()
+end

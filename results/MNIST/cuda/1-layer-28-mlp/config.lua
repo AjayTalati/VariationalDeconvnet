@@ -12,7 +12,7 @@ cuda = false
 batchSize = 128 -- size of mini-batches
 learningRate = 0.03 -- Learning rate used in AdaGrad
 
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
+initrounds = 15 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
@@ -28,25 +28,23 @@ end
 
 -- Model Specific parameters
 filter_size = 5
-stride = 2
 dim_hidden = 25
 input_size = 28 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
+pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
 
-hidden_dec = 20
+hidden_dec = 40
 
-map_size = 14
-factor = stride
+map_size = 28
+factor = 1
 
 
 encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
-encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 
 encoder:add(nn.Reshape(feature_maps * map_size * map_size))

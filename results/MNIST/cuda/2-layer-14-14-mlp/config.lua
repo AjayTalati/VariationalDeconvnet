@@ -1,4 +1,4 @@
-cuda = true
+cuda = false
 
 if cuda then 
 	require 'cutorch'
@@ -23,6 +23,7 @@ if cuda then
 	trainData.data = trainData.data:cuda()
 	testData.data = testData.data:cuda()
 end
+
 -- Model Specific parameters
 filter_size = 5
 filter_size_2 = 5
@@ -39,9 +40,10 @@ total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
 feature_maps_2 = feature_maps*2
 factor = 2
+factor_2 = 1
 
 map_size = 14
-map_size_2 = 7
+map_size_2 = 14
 
  --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
 hidden_dec = 50
@@ -62,7 +64,6 @@ encoder:add(nn.Threshold(0,1e-6))
 
 encoder:add(nn.SpatialZeroPadding(2,2,2,2)) 
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2))
-encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 
 
@@ -91,12 +92,12 @@ decoder:add(nn.Transpose({2,3},{3,4}))
 decoder:add(nn.Reshape(map_size_2*map_size_2*batchSize,feature_maps_2))
 decoder:add(nn.LinearCR(feature_maps_2,hidden_dec_2))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor))
+decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor_2*factor_2))
 decoder:add(nn.Threshold(0,1e-6))
 --layer1
-decoder:add(nn.LinearCR(feature_maps*factor*factor,hidden_dec))
+decoder:add(nn.LinearCR(feature_maps*factor_2*factor_2,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor^4)) 
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor^2*factor_2^2)) 
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
