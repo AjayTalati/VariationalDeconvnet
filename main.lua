@@ -88,7 +88,7 @@ function getLowerbound(data)
     local lowerbound = 0
     for i = 1, data:size(1), batchSize do
         local iend = math.min(data:size(1),i+batchSize-1)
-        xlua.progress(iend, data:size(1))
+        --xlua.progress(iend, data:size(1))
 
         local batch = data[{{i,iend},{}}]
         local f = model:forward(batch)
@@ -166,7 +166,7 @@ while true do
     end
 
 
-    if epoch % 5 == 0 then
+    if epoch % 1 == 0 then
         print('Calculating test lowerbound\n')
         lowerbound_test = getLowerbound(testData.data)
 
