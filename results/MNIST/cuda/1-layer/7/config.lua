@@ -26,7 +26,6 @@ end
 
 -- Model Specific parameters
 filter_size = 5
-
 dim_hidden = 30
 input_size = 28 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
