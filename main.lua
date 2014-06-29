@@ -22,7 +22,7 @@ cmd:text('Options:')
 cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments in')
 cmd:option('-continue', false, 'load parameters from earlier training')
 cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
-cmd:option('tijgerprint', 'hell yeah!!', 'adds tijgerpirnt')
+cmd:option('-tijgerprint', 'hell yeah!!', 'adds tijgerpirnt')
 cmd:option('-verbose', false, 'add verbosity, loooots of prints')
 cmd:option('-cuda', false, 'use CUDA modules')
 
