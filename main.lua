@@ -167,7 +167,7 @@ while true do
 
 
     if epoch % 1 == 0 then
-        print('Calculating test lowerbound\n')
+        
         lowerbound_test = getLowerbound(testData.data)
 
          if lowerbound_test_list then
@@ -176,9 +176,7 @@ while true do
             lowerbound_test_list = torch.Tensor(1,1):fill(lowerbound_test/N_test)
         end
 
-        print('testlowerbound = ')
-        print(lowerbound_test/N_test)
-        print("Saving weights...")
+        print('testlowerbound = ' ... lowerbound_test/N_test)
         weights, gradients = model:getParameters()
 
         torch.save(opt.save .. '/model', model)
