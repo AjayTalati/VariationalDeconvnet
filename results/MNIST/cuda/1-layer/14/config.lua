@@ -1,12 +1,12 @@
 --One layer deconvnet with padding
-cuda = false
+cuda = true
 if cuda then
 	require 'cutorch'
 	require 'cunn'
 	require 'SpatialZeroPaddingCUDA'
 end
 
-cuda = false
+cuda = true
 
 ---Required 
 batchSize = 128 -- size of mini-batches
@@ -28,19 +28,19 @@ end
 
 -- Model Specific parameters
 filter_size = 5
-stride = 2
-dim_hidden = 25
+
+dim_hidden = 30
 input_size = 28 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
+pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
 
-hidden_dec = 20
+hidden_dec = 25
 
 map_size = 14
-factor = stride
+factor = 2
 
 
 encoder = nn.Sequential()
