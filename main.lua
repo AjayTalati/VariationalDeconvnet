@@ -176,7 +176,7 @@ while true do
             lowerbound_test_list = torch.Tensor(1,1):fill(lowerbound_test/N_test)
         end
 
-        print('testlowerbound = ' ... lowerbound_test/N_test)
+        print('testlowerbound = ' .. lowerbound_test/N_test)
         weights, gradients = model:getParameters()
 
         torch.save(opt.save .. '/model', model)
