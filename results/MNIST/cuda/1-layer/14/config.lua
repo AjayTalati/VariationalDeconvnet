@@ -1,16 +1,14 @@
 --One layer deconvnet with padding
-cuda = false
+cuda = true
 if cuda then
 	require 'cutorch'
 	require 'cunn'
 	require 'SpatialZeroPaddingCUDA'
 end
 
-cuda = false
-
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.03 -- Learning rate used in AdaGrad
+learningRate = 0.02 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -28,19 +26,18 @@ end
 
 -- Model Specific parameters
 filter_size = 5
-stride = 2
-dim_hidden = 25
+dim_hidden = 30
 input_size = 28 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
+pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
 
-hidden_dec = 20
+hidden_dec = 25
 
 map_size = 14
-factor = stride
+factor = 2
 
 
 encoder = nn.Sequential()
@@ -66,7 +63,7 @@ decoder:add(nn.Transpose({2,3},{3,4}))
 
 decoder:add(nn.Reshape(map_size*map_size*batchSize,feature_maps))
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
-decoder:add(nn.Threshold(0,0))
+decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))

@@ -22,7 +22,6 @@ cmd:text('Options:')
 cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments in')
 cmd:option('-continue', false, 'load parameters from earlier training')
 cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
-cmd:option('tijgerprint', 'hell yeah!!', 'adds tijgerpirnt')
 cmd:option('-verbose', false, 'add verbosity, loooots of prints')
 cmd:option('-cuda', false, 'use CUDA modules')
 
@@ -89,7 +88,7 @@ function getLowerbound(data)
     local lowerbound = 0
     for i = 1, data:size(1), batchSize do
         local iend = math.min(data:size(1),i+batchSize-1)
-        xlua.progress(iend, data:size(1))
+        --xlua.progress(iend, data:size(1))
 
         local batch = data[{{i,iend},{}}]
         local f = model:forward(batch)
@@ -138,7 +137,7 @@ while true do
 
     for i = 1, N, batchSize do
         local iend = math.min(N,i+batchSize-1)
-        xlua.progress(iend, N)
+        --xlua.progress(iend, N)
 
         local batch
 
@@ -160,7 +159,6 @@ while true do
     end
 
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
-    if opt.tijgerprint == 'hell yeah!!' then print('He Tijgertje :)') end
     if lowerboundlist then
         lowerboundlist = torch.cat(lowerboundlist,torch.Tensor(1,1):fill(lowerbound/N),1)
     else
@@ -168,8 +166,8 @@ while true do
     end
 
 
-    if epoch % 5 == 0 then
-        print('Calculating test lowerbound\n')
+    if epoch % 1 == 0 then
+        
         lowerbound_test = getLowerbound(testData.data)
 
          if lowerbound_test_list then
@@ -178,9 +176,7 @@ while true do
             lowerbound_test_list = torch.Tensor(1,1):fill(lowerbound_test/N_test)
         end
 
-        print('testlowerbound = ')
-        print(lowerbound_test/N_test)
-        print("Saving weights...")
+        print('testlowerbound = ' .. lowerbound_test/N_test)
         weights, gradients = model:getParameters()
 
         torch.save(opt.save .. '/model', model)
