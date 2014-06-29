@@ -41,7 +41,7 @@ factor = 4
 
 
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPooling(4,4,4,4))
 encoder:add(nn.Threshold(0,1e-6))
