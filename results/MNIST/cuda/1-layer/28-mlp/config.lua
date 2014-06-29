@@ -1,6 +1,6 @@
 --One layer deconvnet with padding
 cuda = true
-if cuda then
+if cuda then	
 	require 'cutorch'
 	require 'cunn'
 	require 'SpatialZeroPaddingCUDA'
