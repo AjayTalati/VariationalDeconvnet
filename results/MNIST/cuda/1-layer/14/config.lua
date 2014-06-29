@@ -63,7 +63,7 @@ decoder:add(nn.Transpose({2,3},{3,4}))
 
 decoder:add(nn.Reshape(map_size*map_size*batchSize,feature_maps))
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
-decoder:add(nn.Threshold(0,0))
+decoder:add(nn.Threshold(0,1e-6))
 decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor)) --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
 decoder:add(nn.Sigmoid())
 decoder:add(nn.Reshape(batchSize,total_output_size))
