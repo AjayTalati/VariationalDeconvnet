@@ -6,11 +6,9 @@ if cuda then
 	require 'SpatialZeroPaddingCUDA'
 end
 
-cuda = true
-
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.03 -- Learning rate used in AdaGrad
+learningRate = 0.02 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -28,7 +26,6 @@ end
 
 -- Model Specific parameters
 filter_size = 5
-
 dim_hidden = 30
 input_size = 28 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize

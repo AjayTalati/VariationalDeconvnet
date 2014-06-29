@@ -45,6 +45,7 @@ encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.Threshold(0,1e-6))
 
+
 encoder:add(nn.Reshape(feature_maps * map_size * map_size))
 
 local z = nn.ConcatTable()
