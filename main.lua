@@ -137,7 +137,7 @@ while true do
 
     for i = 1, N, batchSize do
         local iend = math.min(N,i+batchSize-1)
-        xlua.progress(iend, N)
+        --xlua.progress(iend, N)
 
         local batch
 
