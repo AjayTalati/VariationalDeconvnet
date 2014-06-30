@@ -1,11 +1,17 @@
-In this section blabla. 
+In this section our implementation is detailed. We begin by explaining what framework we used and what additions were necessary to implement SGVB. Furthermore, we explain how the framework makes it possible to train networks on the GPU. 
 
 \subsection{Torch7}
 
-brief intro and explain what is missing to implement deconvnet
+Torch7 \cite{collobert2011torch7} is a Machine Learning library written in Lua and C specifically for Neural Networks. Most code is written in C, which interfaces great with Lua and the efficient LuaJIT. In Torch7 it is simple to define a Neural Network, first one defines the type of model (usually Sequential) and then it is possible to stack modules. Examples of a few modules are Sigmoid, Rectified Linear Unit, Convolution and Max Pooling. Finally it is necessary to define a criterion, or objective function, such as the MSEcriterionn. This way of defining a module makes it easy to iterate through many different versions. For example changing the activation function is just one line of code. Also relative to Theano (the other major library used for this purpose) debugging is more straight-forward as the code does not go into a compilation phase.
+
+In order to implement SGVB it was necessary to create several new modules. The first of these modules is the Reparemtrize step, which, in the case of a Gaussian function for g, takes two inputs: the mean and the standard deviation. The output are then samples of this Gaussian made with the noise parameter $\epsilon$. The second module that was not readily available in Torch7 was the Binary Cross Entropy, necessary to compute the reconstruction error after a forward pass through the network. We submitted this module to the authors of Torch7 and it is now part of the standard library.
+
 
 \subsection{CUDA}
 
-explain how this works with torch, what the expactations and pros/cons are, and perhaps which parts of the algorithm we (can) do in CUDA.
+Another benefit of Torch7 is its support for running on the GPU, because most of the commonly used modules are implemented in CUDA, the language used by nVidia graphic cards. In order to make efficient use of CUDA we had to rewrite our modules to only use Torch7 functions that have a CUDA implementation. Without any other changes than rewriting the modules we were able to get a 2 to 3x speed up. After rethinking the structure of our networks and making some vital changes, such as increasing the mini-batch size to 128 and using a convolution module specifically written for the GPU, we managed to get 10 to 20x speed ups.
+
+Unfortunately, as all calculations done by Torch7 on the GPU are in single precision, the network became more unstable. We had to decrease the learning rate and try to use SGD instead of AdaGrad as a means to update the parameters.
+
 
 \newpage
