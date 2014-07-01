@@ -1,0 +1,17 @@
+2-layer-14-7 (nocudamodules) 					time 259
+1-layer-28-conv-nocudamodules					time 185
+2-layer-14-14-mlp (noducamodules)				time 263
+2-layer-14-14-conv (with codamodules)			time 51
+2-layer-14-14-conv-nocudamodules				time 183
+1-layer-14 (with cudamodules)
+
+
+
+already ran: 1-layer-14 noducamodules
+already ran: 1-layer-7 noducamodules
+
+
+
+
+not done:
+1-layer-28-mlp--> linear is buggy
