@@ -17,7 +17,7 @@ gfx = require 'gfx.js'
 
 ------------------------------------------------------------------------------------------------------------
 
-fname = 'results/MNIST/cuda/1-layer/14'
+fname = 'results/MNIST/cuda/1-layer/28-conv'
 --require (fname .. '/config')
 
  
