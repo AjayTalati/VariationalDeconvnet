@@ -1,4 +1,4 @@
-icuda = true
+cuda = true
 
 require 'cutorch'
 require 'cunn'
