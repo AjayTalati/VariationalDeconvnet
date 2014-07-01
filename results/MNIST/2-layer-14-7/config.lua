@@ -35,11 +35,11 @@ colorchannels = 1
 
 --layer1
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPaddingC(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolution(1,feature_maps,filter_size,filter_size,stride,stride))
 encoder:add(nn.Threshold(0,0))
 --layer2
-encoder:add(nn.SpatialZeroPaddingC(pad2_1,pad2_2,pad2_1,pad2_2))
+encoder:add(nn.SpatialZeroPadding(pad2_1,pad2_2,pad2_1,pad2_2))
 encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2,stride_2,stride_2))
 encoder:add(nn.Threshold(0,0))
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2^2))
