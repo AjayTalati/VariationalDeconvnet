@@ -15,8 +15,6 @@ gfx = require 'gfx.js'
 -- luajit -lgfx.start
 -- luajit -lgfx.stop
 
-------------------------------------------------------------------------------------------------------------
-
 fname = 'results/MNIST/cuda/1-layer/28-conv'
 --require (fname .. '/config')
 
