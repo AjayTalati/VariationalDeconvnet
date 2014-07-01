@@ -1,9 +1,10 @@
-cuda = true
+cuda = false
 
-require 'cutorch'
-require 'cunn'
-require 'SpatialZeroPaddingCUDA'
-
+if cuda then
+	require 'cutorch'
+	require 'cunn'
+	require 'SpatialZeroPaddingCUDA'
+end
 
 batchSize = 128 -- size of mini-batches
 learningRate = 0.01 -- Learning rate used in AdaGrad
@@ -28,13 +29,13 @@ filter_size_2 = 5
 stride = 2
 dim_hidden = 25
 input_size = 28 --NB this is done later (line 129)
-pad1 = 1 --NB new size must be divisible with filtersize
+pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 pad_2 = (filter_size_2-1)/2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
-feature_maps_2 = 16
+feature_maps_2 = 32
 factor = 2
 
 map_size = 14
