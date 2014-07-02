@@ -1,5 +1,5 @@
 --One layer deconvnet with padding
-cuda = true	
+cuda = false
 require 'GaussianCriterion'
 if cuda then
 	require 'cutorch'

@@ -29,14 +29,14 @@ end
 -- Model Specific parameters
 filter_size = 5
 stride = 2
-dim_hidden = 100
+dim_hidden = 25
 input_size = 32 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
-feature_maps = 32
-feature_maps_2 = 64
+feature_maps = 16
+feature_maps_2 = 32
 
 hidden_dec = 50
 hidden_dec_2 = 50
@@ -48,18 +48,15 @@ factor = stride
 
 encoder = nn.Sequential()
 --L2
-encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
-encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
-encoder:add(nn.SpatialMaxPoolingCUDA(2,2,2,2))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 --L2
-encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolutionCUDA(feature_maps,feature_maps_2,filter_size,filter_size))
-encoder:add(nn.SpatialMaxPoolingCUDA(2,2,2,2))
-encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size,filter_size))
+encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
-
 
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2 * map_size_2))
 
