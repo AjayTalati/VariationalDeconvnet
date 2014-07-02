@@ -3,11 +3,11 @@ require 'xlua'
 require 'torch'
 require 'nn'
 
-if cuda then
+--if cuda then
     require 'AdagradCUDA'
-else
-    require 'Adagrad'
-end
+--else
+ --   require 'Adagrad'
+--end
 require 'KLDCriterion'
 
 require 'LinearCR'
