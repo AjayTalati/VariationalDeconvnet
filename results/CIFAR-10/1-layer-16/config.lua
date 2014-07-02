@@ -43,11 +43,11 @@ factor = stride
 
 encoder = nn.Sequential()
 ----------------------------   CUDA:    ----------------------------------------------------
-encoder:add(nn.Transpose({4,3},{3,2},{2,1}))
+encoder:add(nn.Transpose({1,2},{2,3},{3,4}))
 encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPoolingCUDA(2,2,2,2))
-encoder:add(nn.Transpose({1,2},{2,3},{3,4}))
+encoder:add(nn.Transpose({4,3},{3,2},{2,1}))
 -- ---------------------------         Regular:        --------------------------
 --encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 --encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
