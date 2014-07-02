@@ -3,11 +3,7 @@ require 'xlua'
 require 'torch'
 require 'nn'
 
---if cuda then
-    require 'AdagradCUDA'
---else
- --   require 'Adagrad'
---end
+
 require 'KLDCriterion'
 
 require 'LinearCR'
@@ -37,6 +33,12 @@ if opt.seed == 'yes' then
 end
 
 require (opt.save .. '/config')
+
+if cuda then
+    require 'AdagradCUDA'
+else
+    require 'Adagrad'
+end
 
 if continuous then
     criterion = nn.GaussianCriterion()
@@ -114,7 +116,7 @@ function getLowerbound(data)
 end
 
 
-if opt.continue == true then --NB need to convert tensor to list!
+if opt.continue == true then 
     print("Loading old weights!")
     lowerboundlist = torch.load(opt.save ..        'lowerbound.t7')
     lowerbound_test_list =  torch.load(opt.save .. 'lowerbound_test.t7')
