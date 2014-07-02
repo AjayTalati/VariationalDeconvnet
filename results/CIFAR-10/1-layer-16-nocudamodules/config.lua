@@ -8,7 +8,7 @@ continuous = true
 
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.03 -- Learning rate used in AdaGrad
+learningRate = 0.015 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -33,7 +33,7 @@ colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
 
-hidden_dec = 20
+hidden_dec = 25
 
 map_size = 16
 factor = stride
