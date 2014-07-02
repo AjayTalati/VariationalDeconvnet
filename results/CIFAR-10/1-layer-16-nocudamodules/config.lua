@@ -1,9 +1,12 @@
 --One layer deconvnet with padding
 require 'GaussianCriterion'
-require 'cutorch'
-require 'cunn'
-require 'SpatialZeroPaddingCUDA'
-cuda = true
+cuda = false
+if cuda then
+	require 'cutorch'
+	require 'cunn'
+	require 'SpatialZeroPaddingCUDA'
+end
+
 continuous = true
 
 ---Required 
@@ -19,8 +22,10 @@ tesize = 10000-16 -- Size of test set
 -- trainData is table with field 'data' which contains the data
 trainData, testData = loadCifar(trsize,tesize,false)
 
-trainData.data = trainData.data:cuda()
-testData.data = testData.data:cuda()
+if cuda then
+	trainData.data = trainData.data:cuda()
+	testData.data = testData.data:cuda()
+end
 
 -- Model Specific parameters
 filter_size = 5
@@ -85,9 +90,10 @@ decoder4:add(nn.Reshape(batchSize,total_output_size))
 decoder4:add(nn.Reshape(batchSize,total_output_size))
 
 decoder5 = nn.ParallelTable()
-decoder5:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
-decoder5:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
-
+if cuda then
+	decoder5:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
+	decoder5:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
+end
 
 model = nn.Sequential()
 model:add(encoder)
@@ -98,9 +104,10 @@ model:add(decoder3)
 model:add(decoder4)
 model:add(decoder5)
 
-encoder:cuda()
-decoder:cuda()
-decoder2:cuda()
-decoder3:cuda()
-decoder4:cuda()
-
+if cuda then
+	encoder:cuda()
+	decoder:cuda()
+	decoder2:cuda()
+	decoder3:cuda()
+	decoder4:cuda()
+end

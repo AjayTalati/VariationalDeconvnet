@@ -3,7 +3,11 @@ require 'xlua'
 require 'torch'
 require 'nn'
 
-require 'AdagradCUDA'
+if cuda then
+    require 'AdagradCUDA'
+else
+    require 'Adagrad'
+end
 require 'KLDCriterion'
 
 require 'LinearCR'
@@ -133,6 +137,7 @@ while true do
     local time = sys.clock()
     local shuffle = torch.randperm(trainData.data:size(1))
     local N = trainData.data:size(1)
+    print(N)
     local N_test = testData.data:size(1)
 
     for i = 1, N, batchSize do
