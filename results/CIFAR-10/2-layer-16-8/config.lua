@@ -11,7 +11,7 @@ continuous = true
 
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.001 -- Learning rate used in AdaGrad
+learningRate = 0.003 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
