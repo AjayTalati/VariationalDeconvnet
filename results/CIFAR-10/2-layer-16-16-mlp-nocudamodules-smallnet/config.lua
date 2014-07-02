@@ -21,6 +21,7 @@ tesize = 10000-16 -- Size of test set
 -- Loading data
 -- trainData is table with field 'data' which contains the data
 trainData, testData = loadCifar(trsize,tesize,false)
+
 if cuda then
 	trainData.data = trainData.data:cuda()
 	testData.data = testData.data:cuda()
@@ -28,6 +29,7 @@ end
 
 -- Model Specific parameters
 filter_size = 5
+
 stride = 2
 dim_hidden = 20
 input_size = 32 --NB this is done later (line 129)
