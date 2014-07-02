@@ -1,5 +1,4 @@
 1-layer-28-conv-nocudamodules					time 185 -successfull NB lr higher than 0.02 makes nans fast. Not converged yet, but ran it with lr = 0.0005
-
 1-layer-14 noducamodules						lb 104 nb check if converged
 1-layer-14 (with cudamodules)					time 33 no success	
 1-layer-7 noducamodules							lb 110
@@ -12,12 +11,13 @@ running:
 2-layer-14-14-conv-nocudamodules				time 183 not converged yet
 1-layer-28-conv-nocudamodules					test with higher lr
 CIFAR 1-layer-16 nocudamodules 					time 205
-CIFAR 1-layer-16 with spatialconvolutionCUDA only
+CIFAR 16-8										gets stuck at +- -200 with dim latent = 25, dim hidden dec = 50 and 16-32 feature maps
 
 staged:
+CIFAR 1-layer-16 with spatialconvolutionCUDA only
+CIFAR 16-8 with cudamodules
 
 
-CIFAR 16-8
 
 planned:
 CIFAR 16-16 conv
