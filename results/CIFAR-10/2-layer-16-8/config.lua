@@ -1,5 +1,5 @@
 --One layer deconvnet with padding
-cuda = false	
+cuda = true	
 require 'GaussianCriterion'
 if cuda then
 	require 'cutorch'
@@ -11,7 +11,7 @@ continuous = true
 
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.03 -- Learning rate used in AdaGrad
+learningRate = 0.01 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
