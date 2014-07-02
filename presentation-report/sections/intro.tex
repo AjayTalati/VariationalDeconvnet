@@ -1,10 +1,12 @@
-Convolutional Neural Networks are a powerful blablabla. \\
-However, so far only supervised methods--> need for training unsupervised. \\
-Enter SGVB and explain how this works with convnets (connection to graphical models?)
-\subsection{Related Work}
-Auto-encoder, Zeilers deconv, not much...
+Convolutional Neural Networks (CNN's) are Neural Networks with convolutional layers, i.e. layers where the connections are such that the output of the layer corresponds to the convolution of the input with a set of learned weights. As in fully-connected Neural Networks, a point-wise non-linearity is applied after the convolution by means of an activation function. The upper limit of the performance of a CNN's is only slightly worse than that of fully-connected networks, but the weight-sharing nature of the connectivity results in much less parameters. \\
+Recently, there has been much success in applying CNN's to image processing tasks such as classification (Krizhevsky), detection, and localization (OverFeat). This succes can mostly be attributed to an increase in the amount of available annotated data, the steady increase in computing power, and efficient implementations on GPU's. \\
+These CNN's are trained on a supervised error criterion, such as Binary Cross-Entropy on class labels for classification tasks (e.g. ...., OverFeat) or logistic regression on x-y coordinates for localization tasks (OverFeat).\\
+However, so far there has only been success in the supervised training of such networks. Unsupervised training of CNN's, although desirable for a multitude of reasons (........ergens moet staan welke allemaal! Discussie of intro?...........), has not yet been done successfully. The most popular approach for unsupervised training of deep, fully-connected Neural Networks is layer-wise, by means of RBM's (Hinton refs ofzo). This technique is restricted to fully-connected layers and can therefore not be applied to CNN's. Recently, however, Kingma and Welling developed an effective, efficient method to perform approximate inference with Variational Bayes by means of stochastic gradient ascent on the variational lower bound. Stochastic Gradient Variational Bayes (SGVB) has been successfully applied to unsupervised training of fully-connected neural networks (Kingma and Welling), and first empirical results show that, for the tasks investigated, this outperforms RBM's (internal communication). In theory, SGVB also enables unsupervised training of CNN's. \\ 
+
 
 \subsection{This Project}
+In this paper, we use this method to train CNN's unsupervised. (..........hier stukje over wat we allemaal doen..........).
+
 explain main goal: get unsupervised convnet to work \\
 Adress Subquestions
 \newpage
