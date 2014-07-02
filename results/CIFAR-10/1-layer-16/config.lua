@@ -10,7 +10,7 @@ continuous = true
 batchSize = 128 -- size of mini-batches
 learningRate = 0.03 -- Learning rate used in AdaGrad
 
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
+initrounds = 20 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
@@ -21,6 +21,8 @@ trainData, testData = loadCifar(trsize,tesize,false)
 
 trainData.data = trainData.data:cuda()
 testData.data = testData.data:cuda()
+
+
 
 -- Model Specific parameters
 filter_size = 5
@@ -41,11 +43,11 @@ factor = stride
 
 encoder = nn.Sequential()
 ----------------------------   CUDA:    ----------------------------------------------------
-encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+encoder:add(nn.Transpose({1,2},{2,3},{3,4}))
 encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
 encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPoolingCUDA(2,2,2,2))
-encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+encoder:add(nn.Transpose({4,3},{3,2},{2,1}))
 -- ---------------------------         Regular:        --------------------------
 --encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
 --encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
