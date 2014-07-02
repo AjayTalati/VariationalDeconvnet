@@ -1,6 +1,6 @@
 --One layer deconvnet with padding
 require 'GaussianCriterion'
-cuda = false
+cuda = true
 if cuda then
 	require 'cutorch'
 	require 'cunn'
@@ -11,9 +11,9 @@ continuous = true
 
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.015 -- Learning rate used in AdaGrad
+learningRate = 0.03 -- Learning rate used in AdaGrad
 
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
+initrounds = 20 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
@@ -30,15 +30,15 @@ end
 -- Model Specific parameters
 filter_size = 5
 stride = 2
-dim_hidden = 50
+dim_hidden = 100
 input_size = 32 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
-feature_maps = 16
+feature_maps = 32
 
-hidden_dec = 25
+hidden_dec = 50
 
 map_size = 16
 factor = stride
@@ -89,8 +89,8 @@ decoder4 = nn.ParallelTable()
 decoder4:add(nn.Reshape(batchSize,total_output_size))
 decoder4:add(nn.Reshape(batchSize,total_output_size))
 
-decoder5 = nn.ParallelTable()
 if cuda then
+	decoder5 = nn.ParallelTable()
 	decoder5:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
 	decoder5:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
 end
@@ -102,9 +102,10 @@ model:add(decoder)
 model:add(decoder2)
 model:add(decoder3)
 model:add(decoder4)
-model:add(decoder5)
+
 
 if cuda then
+	model:add(decoder5)
 	encoder:cuda()
 	decoder:cuda()
 	decoder2:cuda()
