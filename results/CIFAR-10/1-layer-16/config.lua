@@ -25,15 +25,15 @@ testData.data = testData.data:cuda()
 -- Model Specific parameters
 filter_size = 5
 stride = 2
-dim_hidden = 60
+dim_hidden = 100
 input_size = 32 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
-feature_maps = 16
+feature_maps = 32
 
-hidden_dec = 25
+hidden_dec = 50
 
 map_size = 16
 factor = stride
