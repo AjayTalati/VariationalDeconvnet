@@ -8,7 +8,7 @@ continuous = true
 
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.03 -- Learning rate used in AdaGrad
+learningRate = 0.015 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -25,15 +25,15 @@ testData.data = testData.data:cuda()
 -- Model Specific parameters
 filter_size = 5
 stride = 2
-dim_hidden = 100
+dim_hidden = 50
 input_size = 32 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
-feature_maps = 32
+feature_maps = 16
 
-hidden_dec = 50
+hidden_dec = 25
 
 map_size = 16
 factor = stride
@@ -41,15 +41,15 @@ factor = stride
 
 encoder = nn.Sequential()
 ----------------------------   CUDA:    ----------------------------------------------------
-encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
-encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
-encoder:add(nn.SpatialMaxPoolingCUDA(2,2,2,2))
-encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
+--encoder:add(nn.Transpose({1,4},{1,3},{1,2}))
+--encoder:add(nn.SpatialZeroPaddingCUDA(pad1,pad2,pad1,pad2))
+--encoder:add(nn.SpatialConvolutionCUDA(colorchannels,feature_maps,filter_size,filter_size))
+--encoder:add(nn.SpatialMaxPoolingCUDA(2,2,2,2))
+--encoder:add(nn.Transpose({4,1},{4,2},{4,3}))
 -- ---------------------------         Regular:        --------------------------
---encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
---encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
---encoder:add(nn.SpatialMaxPooling(2,2,2,2))
+encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
+encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 
 encoder:add(nn.Threshold(0,1e-6))
 
