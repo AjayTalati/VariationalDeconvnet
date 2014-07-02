@@ -5,7 +5,7 @@ require 'SpatialZeroPaddingCUDA'
 cuda = true
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.02 -- Learning rate used in AdaGrad
+learningRate = 0.005 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
