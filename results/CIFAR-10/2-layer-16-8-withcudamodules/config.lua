@@ -38,8 +38,8 @@ total_output_size = colorchannels * input_size ^ 2
 feature_maps = 32
 feature_maps_2 = 64
 
-hidden_dec = 50
-hidden_dec_2 = 50
+hidden_dec = 100
+hidden_dec_2 = 100
 
 map_size = 16
 map_size_2 = 8
