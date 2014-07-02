@@ -4,9 +4,9 @@ require 'torch'
 require 'nn'
 
 --if cuda then
---    require 'AdagradCUDA'
+    require 'AdagradCUDA'
 --else
-    require 'Adagrad'
+ --   require 'Adagrad'
 --end
 require 'KLDCriterion'
 
