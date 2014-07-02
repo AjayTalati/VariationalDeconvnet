@@ -10,7 +10,7 @@ continuous = true
 batchSize = 128 -- size of mini-batches
 learningRate = 0.03 -- Learning rate used in AdaGrad
 
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
+initrounds = 20 -- Amount of intialization rounds in AdaGrad
 
 trsize = 50000-80 -- Size of training set
 tesize = 10000-16 -- Size of test set
@@ -21,6 +21,8 @@ trainData, testData = loadCifar(trsize,tesize,false)
 
 trainData.data = trainData.data:cuda()
 testData.data = testData.data:cuda()
+
+
 
 -- Model Specific parameters
 filter_size = 5
