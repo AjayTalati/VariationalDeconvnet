@@ -25,7 +25,7 @@ testData.data = testData.data:cuda()
 -- Model Specific parameters
 filter_size = 5
 stride = 2
-dim_hidden = 25
+dim_hidden = 50
 input_size = 32 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2

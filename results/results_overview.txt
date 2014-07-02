@@ -9,13 +9,14 @@
 running:
 2-layer-14-14-conv-nocudamodules				time 183 not converged yet
 1-layer-28-conv-nocudamodules					test with higher lr
-1-layer-14 (with cudamodules)
+1-layer-14 (with cudamodules)					
+1-layer-16 nocudamodules
+1-layer-16 with cudamudules
 
 not done:
 1-layer-28-mlp--> linear is buggy
 
 CIFAR-10:
 
-1-layer-16 cudamodules
-1-layer-16 noducdmudules
+
 
