@@ -36,7 +36,7 @@ pad_2 = (filter_size_2-1)/2
 colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
-feature_maps_2 = 32
+feature_maps_2 = 16
 factor = 2
 
 map_size = 16
