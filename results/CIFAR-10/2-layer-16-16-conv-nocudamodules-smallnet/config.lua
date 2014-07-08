@@ -1,4 +1,4 @@
-cuda = false
+cuda = true
 
 
 if cuda then
@@ -17,7 +17,7 @@ tesize = 10000-16 -- Size of test set
 
 -- Loading data
 -- trainData is table with field 'data' which contains the data
-trainData, testData = loadMnist(trsize,tesize)
+trainData, testData = loadCifar(trsize,tesize,false)
 
 if cuda then
 	trainData.data = trainData.data:cuda()
@@ -28,18 +28,18 @@ end
 filter_size = 5
 filter_size_2 = 5
 stride = 2
-dim_hidden = 25
-input_size = 28 --NB this is done later (line 129)
+dim_hidden = 20
+input_size = 32 --NB this is done later (line 129)
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 pad_2 = (filter_size_2-1)/2
-colorchannels = 1
+colorchannels = 3
 total_output_size = colorchannels * input_size ^ 2
 feature_maps = 16
-feature_maps_2 = 32
+feature_maps_2 = 16
 factor = 2
 
-map_size = 14
+map_size = 16
 map_size_2 = map_size
 
 --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
@@ -47,7 +47,7 @@ hidden_dec = 50
 
 
 
-colorchannels = 1
+
 
 --layer1
 encoder = nn.Sequential()
