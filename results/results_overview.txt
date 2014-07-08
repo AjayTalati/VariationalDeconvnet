@@ -12,17 +12,15 @@ not converged yet:
 
 CIFAR 16-8										gets stuck at +- -400 with dim latent = 25, dim hidden dec = 50 and 16-32 feature maps. 
 												same for more parameters. Ran for only 3 epochs
-1-layer-14 noducamodules						lb 104 nb check if converged
 1-layer-28-conv-nocudamodules					time 183 nearly converged - trouble restarting learning (wrong adagrad parameters??)
 
 running:
-
-
-
-staged for continue:
 2-layer-14-14-conv-nocudamodules				time 317
 CIFAR 1-layer-16 nocudamodules 					time 205
 CIFAR 16-16-mlp-nocuda-smallnet					few epochs done, seemed promising
+1-layer-14 noducamodules						lb 104 nb check if converged
+
+staged:
 
 
 planned:
