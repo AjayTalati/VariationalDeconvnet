@@ -1,8 +1,10 @@
-require 'cutorch'
-require 'cunn'
-require 'SpatialZeroPaddingCUDA'
+cuda = false
 
-cuda = true
+if cuda then
+	require 'cutorch'
+	require 'cunn'
+	require 'SpatialZeroPaddingCUDA'
+end
 
 batchSize = 128 -- size of mini-batches
 learningRate = 0.005 -- Learning rate used in AdaGrad

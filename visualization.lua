@@ -16,7 +16,7 @@ gfx = require 'gfx.js'
 -- luajit -lgfx.stop
 
 fname = 'results/MNIST/cuda/1-layer/28-conv-nocudamodules-goodlr'
---require (fname .. '/config')
+require (fname .. '/config')
 
  
 ------------------------------------------------------------------------------------------------------------
@@ -48,16 +48,38 @@ end
 
 function plot_lowerbound() -- add testlowerbound later
 	lowerbound = torch.load(fname .. '/lowerbound.t7')
-	--lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
-	values = 	  torch.Tensor(lowerbound:size(1)	  ,2)
-	--values_test = torch.Tensor(lowerbound_test:size(1),2)
-	values[{{},{2}}] 	  = lowerbound[{{1,lowerbound:size(1)}}]
-	--values_test[{{},{2}}] = lowerbound_test[{{1,lowerbound_test:size(1)}}]
-	values[{{},{1}}] 	  = torch.linspace(1,50000* lowerbound:size(1),     lowerbound:size(1))
-	--values_test[{{},{1}}] = torch.linspace(1,250000*lowerbound_test:size(1),lowerbound_test:size(1))
+	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
+	values_train = 	  torch.Tensor(lowerbound:size(1)	  ,2)
+	values_test = torch.Tensor(lowerbound_test:size(1),2)
+	values_train[{{},{2}}] 	  = lowerbound[{{1,lowerbound:size(1)}}]
+	values_test[{{},{2}}] = lowerbound_test[{{1,lowerbound_test:size(1)}}]
+	values_train[{{},{1}}] 	  = torch.linspace(1,50000* lowerbound:size(1),     lowerbound:size(1))
+	values_test[{{},{1}}] = torch.linspace(1,50000*lowerbound_test:size(1),lowerbound_test:size(1))
 
-	--gfx.chart({ values, values_test },{chart = 'line'})
-	gfx.chart({ values },{chart = 'line'})
+	--gfx.chart({ values_train, values_test },{chart = 'line'})
+	--gfx.chart({ values },{chart = 'line'})
+
+	data = {
+	    {
+	        key = 'Train',
+	        color = '#00f',
+	        values = values_train,
+	    },
+	    {
+	        key = 'Test',
+	        color = '#0f0',
+	        values = values_test,
+	    },
+	}
+	gfx.chart(data, {
+	   chart = 'line', -- or: bar, stacked, multibar, scatter
+	   width = 600,
+	   height = 450,
+	   yLabel = 'testtitle',
+	})
+	print(lowerbound[lowerbound:size()])
+	print(lowerbound_test[lowerbound_test:size()])
+
 
 end
 

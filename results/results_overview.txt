@@ -1,27 +1,34 @@
-1-layer-28-conv-nocudamodules					time 185 -successfull NB lr higher than 0.02 makes nans fast. Not converged yet, but ran it with lr = 0.0005
-1-layer-14 noducamodules						lb 104 nb check if converged
+1-layer-28-conv-nocudamodules					time 185 -successfull NB lr higher than 0.02 makes lr = 0.0005 (too low)
 1-layer-14 (with cudamodules)					time 33 no success	
-1-layer-7 noducamodules							lb 110
+1-layer-7 noducamodules							lb 110 check if converged
 2-layer-14-7 (nocudamodules) 					time 259 - no success after 30 epochs
 2-layer-14-14-conv (with codamodules)			time 51 no success
 2-layer-14-14-mlp (noducamodules)				time 263 -lb around 140 - nan after 13 epochs
 CIFAR 1-layer-16 with cudamudules				time 107 nan bij epoch 7, of komt niet voorbij -150
-2-layer-14-14-conv-nocudamodules				time 183 not converged yet
 CIFAR 16-8 with cudamodules 					KLD = approx 0, lb -400
+CIFAR 1-layer-16 with spatialconvolutionCUDA only	doesnt work again, KLD stays around 0 etc
+
+not converged yet:
+
+CIFAR 16-8										gets stuck at +- -400 with dim latent = 25, dim hidden dec = 50 and 16-32 feature maps. 
+												same for more parameters. Ran for only 3 epochs
+1-layer-14 noducamodules						lb 104 nb check if converged
+1-layer-28-conv-nocudamodules					time 183 nearly converged - trouble restarting learning (wrong adagrad parameters??)
 
 running:
-idle
-1-layer-28-conv-nocudamodules					not converged yet
-CIFAR 1-layer-16 nocudamodules 					time 205
-CIFAR 16-8										gets stuck at +- -400 with dim latent = 25, dim hidden dec = 50 and 16-32 feature maps, same for more parameters
 
-staged:
-CIFAR 1-layer-16 with spatialconvolutionCUDA only
+
+
+staged for continue:
+2-layer-14-14-conv-nocudamodules				time 317
+CIFAR 1-layer-16 nocudamodules 					time 205
+CIFAR 16-16-mlp-nocuda-smallnet					few epochs done, seemed promising
 
 
 planned:
 CIFAR 16-16 conv
 CIFAR 16-16 mlp
+14-14-conv-nocudamodules
 
 not done:
 1-layer-28-mlp--> linear is buggy

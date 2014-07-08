@@ -1,13 +1,55 @@
-\subsection{General Network Architecture}
-General convnet stuff, number of feature maps, map sizes etc
+In this section, we will describe how we attempt to answer our research questions.
+
+\subsection{Datasets and Preprocessing}
+
+We ran experiments on the MNIST dataset of handwritten digits and the CIFAR-10 dataset. MNIST contains 60.000 greyscale images of handwritten digits with a resolution of 28x28. The CIFAR-10 dataset also contains 60.000 images, but these are 32x32 colour images of objects from ten classes. Both sets have a division into a training set of 50.000 examples and a test set of 10.000 examples. \\
+Often various preprocessing and data augmentation methods are used to increase the performance of CNN's (.....local contrastive normalization, deskewing, adding training images..... hier wat refs ........). In this project, the data was only normalized.
 
 \subsection{Deconvolution}
-How to do this
+One challenge to training DNN's how to design the decoder, which performs the deconvolution. Each convolutional operation in the encoder, including possible subsampling steps, must have a matching deconvolutional operation in the decoder for the decoder to reconstruct the original data $X$ from latent representation $Z$. In order to keep the advantages that CNN's have due to weight-sharing, the number of parameters in the convolution operation and the corresponding deconvolution operation should be in the same order. \\
+One way to perform deconvolution is to use another convolutional layer for the deconvolution. Suppose the convolutional operation in the encoder is only a convolution of $L$ feature maps in layer $A$ with $M$ $n \times n$ filters and a $tanh$ activation function, with a stride of one and no sub-sampling layer. This results in $M$ feature maps in layer $B$:
 
-\subsection{Hidden Space}
-not sure if this needs a separate subsection
+\begin{align}
+\label{eq:conv}
+f^B_m = tanh( \sum_{l=1}^{L}  f^A_l*k_m + b_m)
+\end{align}
 
-\subsection{Miscellaneous Hyperparameters}
-m.n. learningrate, adagrad
+In this case, we can use $L$ convolutions to perform deconvolution:
+
+\begin{align}
+f^{\prime A}_l = tanh( \sum_{m=1}^{M}  f^{\prime B}_m \cdot k_l + b_l)
+\end{align}
+
+One complication of this method is that if the spatial dimensions of $f^A$ do not equal those of $f^B$ due to a max-pooling or subsampling operation, the only way to reconstruct $f^{\prime A}$ in the same spatial dimensions is through use of a simple up-sampling scheme. This does not seem very powerful, so in our experiments we only used this method in architectures where the feature maps of two subsequent layers have the same spatial dimensions. To achieve this, both $f^A$ and $f^{\prime B}$ are zero padded.
+This method results in a different amount of parameters in the deconvolutional layer than in the convolutional layer if $L\neq M$. In CNN's, this is often not the case; typically the number of feature maps increases in subsequent layers of a CNN. If the number of feature maps increases by a factor of $d$, the decoding layer will have a factor of $d$ less parameters than the encoding layer. If this factor is especially large, as is often the case in the first layer, this could be compensated by using the same number of filters in both the encoding step and the decoding step, and summing over feature maps in the decoding step. For this to be possible, $d$ must be an integer.
+\\
+A different method we used to perform deconvolution is through a two-layer MLP with weight-sharing. Suppose once again we have a convolutional operation in the encoder as in equation \ref{eq:conv}. We can define the deconvolutional operation on one spatial position $r$ as an MLP:
+
+\begin{align}
+f^{\prime A}_r = tanh(W_2 \cdot h_r + b_2)
+\end{align}
+
+Where the vector $h_r$ is the output of the hidden layer for position r:
+
+\begin{align}
+h_r = tanh(W_1 \cdot f^{\prime B}_{r} + b_1)
+\end{align}
+
+Note that $f^{\prime A}_r$ and $f^{\prime B}_r$ are the values of one position of \textit{all} the feature maps in that layer of the decoder. This MLP can be considered to have the same weight-sharing nature as a typical convolutional layer because the same weights are used for each spatial location in the feature maps $f^{\prime B}$ and its corresponding position in $f^{\prime A}$.\\
+This structure can be implemented efficiently by reshaping $f^{\prime B}$ to a vector or, in case of batch learning, a matrix. A crucial advantage of this structure for the deconvolutional operation is that it allows for a change in spatial resolution. The dimensionality of $W_2$ and $b_2$ determine the dimensionality of $f^{\prime A}_r$. This way, upsampling is possible with an integer factor. \\
+One last consideration is that the number of hidden units $h$ determines the number of parameters in the deconvolution. For the deconvolution to have the same amount of parameters as the convolution we must have that
+\begin{align}
+N_{hidden} = \frac{N_{f,B} * kw * kh}{(N_{f,A} + a^2)}
+\end{align}
+Where $N_{hidden}$ is the number of hidden units, $N_{f,B}$ is the number of feature maps in layer $B$, $kw$ and $kh$ are the kernel width and kernel hight, respectively, and $a$ is the up-sampling factor. In our experiments we will choose $N_{hidden}$ at least this size.
+
+\subsection{General Network Architecture}
+One of the first successful CNN's is LeNet-5 ( ref leCunn), which was designed for the MNIST dataset. Since we will also run experiments on the MNIST dataset, this CNN seems like a good starting point to design DNN's. LeNet-5 contains two convolutional layers, each one followed by a 2x2 subsampling layer. Finally, the network has three fully-connected layers to the ten output nodes, which represent class predictions. Each consecutive layer has a lower spatial resolution, but a higher number of feature maps, a network property which has also proven effective for application to other datasets.\\
+Such a structure is compatible for use in a DNN with SGVB. As in LeNet-5, full connections can be used from the final feature maps. Instead of connecting to class labels, a DNN connects to latent variables $z$. One constraint added by the Deconvolution methods is that zero padding must be used to keep the spatial resolution constant between two layers or, in case of subsampling, to keep the ratio between the spatial resolutions of subsequent layers an integer.  \\
+Besides these restrictions, some choices of default settings were made to make results comparable. For optimal efficiency in CUDA, the number of feature maps in each layer should be a power of two. For MNIST we choose to use 16 feature maps in the first layer and 32 in the second layer. For CIFAR-10 we consistently used 32 and 64 feature maps, respectively. In all experiments, a filter size of $5 \times 5$ was used. For some datasets this can be too small, but MNIST and CIFAR-10 have a low resolution, so this seems like a reasonable choice at least. For the dimensionality of $z$, we used 25 latent variables for MNIST as this has been shown to be enough to encode MNIST effectively in our earlier project (unpublished). For CIFAR-10, we used 100 latent variables. This might even be on the small side as CIFAR-10 contains much more complex structures, but since we use a fully connected layer from the feature maps in the final convolutional layer to the latent variables, increasing the number of latent variables also greatly increases the number of parameters in the model.
+
+\subsection{Learning rate}
+
+For efficient learning we implemented AdaGrad (ref), which requires, and is sensitive to, an initial learning rate. As we have no prior notions on how various architectures influence the desired learning rate, we optimized the learning rate for each experiment through trial-and-error.
 
 \newpage
