@@ -15,7 +15,7 @@ gfx = require 'gfx.js'
 -- luajit -lgfx.start
 -- luajit -lgfx.stop
 
-fname = 'results/MNIST/cuda/2-layer/14-14-conv-nocudamodules'
+fname = 'results/MNIST/cuda/2-layer/14-7'
 require (fname .. '/config')
 
  
@@ -49,6 +49,7 @@ end
 function plot_lowerbound() -- add testlowerbound later
 	cutoff = 2
 	lowerbound = torch.load(fname .. '/lowerbound.t7')
+	print(lowerbound)
 	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
 	values_train = 	  torch.Tensor(lowerbound:size(1) - cutoff, 2)
 	values_test = torch.Tensor(lowerbound_test:size(1)- cutoff, 2)
