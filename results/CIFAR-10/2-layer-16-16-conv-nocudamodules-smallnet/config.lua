@@ -8,7 +8,7 @@ if cuda then
 end
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.1 -- Learning rate used in AdaGrad
+learningRate = 0.03 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
