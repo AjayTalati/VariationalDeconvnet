@@ -47,7 +47,6 @@ hidden_dec = 100
 
 
 
-colorchannels = 1
 
 --layer1
 encoder = nn.Sequential()

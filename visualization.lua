@@ -54,8 +54,8 @@ function plot_lowerbound() -- add testlowerbound later
 	values_test = torch.Tensor(lowerbound_test:size(1)- cutoff, 2)
 	values_train[{{},{2}}] 	  = lowerbound[{{1+cutoff,lowerbound:size(1)}}]
 	values_test[{{},{2}}] = lowerbound_test[{{1+cutoff,lowerbound_test:size(1)}}]
-	values_train[{{},{1}}] 	  = torch.linspace(5*(cutoff+1),5*lowerbound:size(1),     lowerbound:size(1)-cutoff)
-	values_test[{{},{1}}] = torch.linspace(5*(cutoff+1),5*lowerbound_test:size(1),lowerbound_test:size(1)-cutoff)
+	values_train[{{},{1}}] 	  = torch.linspace(0.5*(cutoff+1),0.5*lowerbound:size(1),     lowerbound:size(1)-cutoff)
+	values_test[{{},{1}}] = torch.linspace(0.5*(cutoff+1),0.5*lowerbound_test:size(1),lowerbound_test:size(1)-cutoff)
 
 	--gfx.chart({ values_train, values_test },{chart = 'line'})
 	--gfx.chart({ values },{chart = 'line'})
