@@ -1,5 +1,7 @@
 --One layer deconvnet with padding
 cuda = true
+
+require('Linear')
 if cuda then	
 	require 'cutorch'
 	require 'cunn'
