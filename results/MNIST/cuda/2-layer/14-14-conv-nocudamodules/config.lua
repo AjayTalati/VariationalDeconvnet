@@ -1,4 +1,4 @@
-cuda = true
+cuda = false
 
 
 if cuda then

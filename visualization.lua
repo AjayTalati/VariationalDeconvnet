@@ -15,7 +15,7 @@ gfx = require 'gfx.js'
 -- luajit -lgfx.start
 -- luajit -lgfx.stop
 
-fname = 'results/MNIST/cuda/1-layer/14-nocudamodules'
+fname = 'results/MNIST/cuda/2-layer/14-14-conv-nocudamodules'
 require (fname .. '/config')
 
  
