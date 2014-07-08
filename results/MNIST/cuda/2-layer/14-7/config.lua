@@ -1,4 +1,4 @@
-cuda = false
+cuda = true
 
 if cuda then 
 	require 'cutorch'
