@@ -51,6 +51,7 @@ function plot_lowerbound() -- add testlowerbound later
 	lowerbound = torch.load(fname .. '/lowerbound.t7')
 	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
 	print(lowerbound_test)
+	print(lowerbound)
 	values_train = 	  torch.Tensor(lowerbound:size(1) - cutoff, 2)
 	values_test = torch.Tensor(lowerbound_test:size(1)- cutoff, 2)
 	values_train[{{},{2}}] 	  = lowerbound[{{1+cutoff,lowerbound:size(1)}}]
