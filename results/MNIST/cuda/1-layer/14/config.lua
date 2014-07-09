@@ -6,6 +6,8 @@ if cuda then
 	require 'SpatialZeroPaddingCUDA'
 end
 
+require 'SpatialZeroPaddingCUDA'
+
 ---Required 
 batchSize = 128 -- size of mini-batches
 learningRate = 0.02 -- Learning rate used in AdaGrad
