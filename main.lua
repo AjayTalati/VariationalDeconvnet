@@ -78,7 +78,6 @@ opfunc = function(batch)
     encoder:backward(batch,dKLD_dw)
 
     local lowerbound = err  + KLDerr
-
     if opt.verbose then
         print("BCE",err/batch:size(1))
         print("KLD", KLDerr/batch:size(1))
@@ -126,7 +125,9 @@ if opt.continue == true then
     weights, gradients = model:getParameters()
 
     weights:copy(w)
-
+    if opt.verbose then
+        print(weights:size())
+    end
     epoch = lowerboundlist:size(1)
 else
     epoch = 0

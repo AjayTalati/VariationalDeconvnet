@@ -1,4 +1,4 @@
-cuda = false
+cuda = true
 
 if cuda then 
 	require 'cutorch'
@@ -8,7 +8,7 @@ end
 
 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.02 -- Learning rate used in AdaGrad
+learningRate = 0.05 -- Learning rate used in AdaGrad
 
 initrounds = 5 -- Amount of intialization rounds in AdaGrad
 
