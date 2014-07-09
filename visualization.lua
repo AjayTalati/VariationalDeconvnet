@@ -15,7 +15,7 @@ gfx = require 'gfx.js'
 -- luajit -lgfx.start
 -- luajit -lgfx.stop
 
-fname = 'results/MNIST/cuda/2-layer/14-7'
+fname = 'results/MNIST/cuda/2-layer/14-14-mlp'
 require (fname .. '/config')
 
  
@@ -47,16 +47,16 @@ function display_weights(model, layers)
 end
 
 function plot_lowerbound() -- add testlowerbound later
-	cutoff = 2
+	cutoff = 0
 	lowerbound = torch.load(fname .. '/lowerbound.t7')
-	print(lowerbound)
 	lowerbound_test = torch.load(fname .. '/lowerbound_test.t7')
+	print(lowerbound_test)
 	values_train = 	  torch.Tensor(lowerbound:size(1) - cutoff, 2)
 	values_test = torch.Tensor(lowerbound_test:size(1)- cutoff, 2)
 	values_train[{{},{2}}] 	  = lowerbound[{{1+cutoff,lowerbound:size(1)}}]
 	values_test[{{},{2}}] = lowerbound_test[{{1+cutoff,lowerbound_test:size(1)}}]
-	values_train[{{},{1}}] 	  = torch.linspace(0.5*(cutoff+1),0.5*lowerbound:size(1),     lowerbound:size(1)-cutoff)
-	values_test[{{},{1}}] = torch.linspace(0.5*(cutoff+1),0.5*lowerbound_test:size(1),lowerbound_test:size(1)-cutoff)
+	values_train[{{},{1}}] 	  = torch.linspace(50000*(cutoff+1),50000*lowerbound:size(1),     lowerbound:size(1)-cutoff)
+	values_test[{{},{1}}] = torch.linspace(50000*(cutoff+1),50000*lowerbound_test:size(1),lowerbound_test:size(1)-cutoff)
 
 	--gfx.chart({ values_train, values_test },{chart = 'line'})
 	--gfx.chart({ values },{chart = 'line'})
@@ -81,6 +81,8 @@ function plot_lowerbound() -- add testlowerbound later
 	})
 	print(lowerbound[lowerbound:size()])
 	print(lowerbound_test[lowerbound_test:size()])
+	print(lowerbound:max())
+	print(lowerbound_test:max())
 
 
 end

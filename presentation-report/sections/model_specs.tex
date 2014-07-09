@@ -50,6 +50,6 @@ Besides these restrictions, some choices of default settings were made to make r
 
 \subsection{Learning rate}
 
-For efficient learning we implemented AdaGrad (ref), which requires, and is sensitive to, an initial learning rate. As we have no prior notions on how various architectures influence the desired learning rate, we optimized the learning rate for each experiment through trial-and-error.
+For efficient learning we implemented AdaGrad (ref), which requires, and is sensitive to, an initial learning rate. As we have no prior notions on how various architectures influence the desired learning rate, we optimized the learning rate for each experiment through trial-and-error. To create more stable learning, the first ten batches were only used to update the gradient history of AdaGrad and not to update the parameters of the model.
 
 \newpage

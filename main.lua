@@ -34,11 +34,11 @@ end
 
 require (opt.save .. '/config')
 
-if cuda then
-    require 'AdagradCUDA'
-else
+--if cuda then
+    --require 'AdagradCUDA'
+--else
     require 'Adagrad'
-end
+--end
 
 if continuous then
     criterion = nn.GaussianCriterion()

@@ -21,17 +21,16 @@ Table \ref{overview} shows an overview of the results for MNIST experiments.
 \begin{tabular}{| l | l | l | l | l | l | l | l | l |}
 
 	\hline
-  Number of layers & 1 & 1 & 1 & 1 & 2 & 2 & 2 & .. \\ \hline
-  Feature map size & 28 & 28 & 14 & 7 & .. & .. & .. & .. \\ \hline
-  Deconvolution Method & Conv & MLP & MLP & MLP & .. & .. & .. & .. \\ \hline
-  Total number of parameters & .. & .. & .. & .. & .. & .. & .. & .. \\ \hline
-  Run time for one epoch with CUDA & .. & .. & .. & .. & .. & .. & .. & .. \\ \hline
-  Train lower bound & 101,7 & .. & .. & .. & .. & .. & .. & .. \\ \hline
-  Test lower bound & 102,57 & .. & .. & .. & .. & .. & .. & .. \\ \hline
-  %1 & 28 	& SpatialConvolution 	& .. & .. & -.. \\ \hline
-  %1 & 28 	& MLP					& .. & .. & -.. \\ \hline
-  %1 & 14 	& MLP 					& .. & .. & -.. \\ \hline
-  %1 & 7  	& MLP 					& .. & .. & -.. \\ \hline
+  Number of layers 					& 1 	 	& 1 		& 1 		& 2 		& 2 			& 2 		& .. \\ \hline
+  Feature map size 					& 7 		& 14 	& 28 	& 14-7	& ..			& .. 	& .. \\ \hline
+  Deconvolution Method 				& MLP 	& MLP	& Conv 	& MLP	& MLP\& Conv	& ..		& ..	 \\ \hline
+  Total number of parameters 		& .. 	& .. 	& ..		& ..		& ..			& .. 	& .. \\ \hline
+  Train lower bound 					& 108.9 	& 102.8 	& 101.3 	& 126.7*	& ..			& ..		& .. \\ \hline
+  Test lower bound 					& 109.5	& 103.7 	& 102.3 	& 126.5*	& ..			& ..		& .. \\ \hline
+  %1 & 28 	& SpatialConvolution 	& .. & .. 	& -.. \\ \hline
+  %1 & 28 	& MLP					& .. & .. 	& -.. \\ \hline
+  %1 & 14 	& MLP 					& .. & .. 	& -.. \\ \hline
+  %1 & 7  	& MLP 					& .. & .. 	& -.. \\ \hline
   %2 & 14 14 	& SpatialConvolution 	& .. & .. & -.. \\ \hline
   %1 & 28 14	& SpatialConvolution 	& .. & .. & - N/A \\ \hline
   %1 & 14 7 	& SpatialConvolution 	& .. & .. & - N/A \\ \hline
