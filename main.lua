@@ -126,7 +126,7 @@ if opt.continue == true then
 
     weights:copy(w)
     if opt.verbose then
-        print weights:size()
+        print(weights:size())
     end
     epoch = lowerboundlist:size(1)
 else
