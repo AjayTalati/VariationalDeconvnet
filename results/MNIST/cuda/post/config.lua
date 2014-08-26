@@ -1,15 +1,8 @@
 --One layer deconvnet with padding
-cuda = false
 if cuda then
 	require 'cutorch'
 	require 'cunn'
 end
-
----Required 
-batchSize = 128 -- size of mini-batches
-learningRate = 0.02 -- Learning rate used in AdaGrad
-
-initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
 -- Loading data
 -- trainData is table with field 'data' which contains the data

@@ -2,6 +2,7 @@ require 'sys'
 require 'xlua'
 require 'torch'
 require 'nn'
+require 'optim'
 
 
 require 'KLDCriterion'
@@ -31,13 +32,10 @@ if opt.seed == 'yes' then
     torch.manualSeed(1)
 end
 
-require (opt.save .. '/config')
+---Required 
+batchSize = 128 
 
-if cuda then
-    require 'AdagradCUDA'
-else
-    require 'Adagrad'
-end
+require (opt.save .. '/config')
 
 if continuous then
     criterion = nn.GaussianCriterion()
@@ -49,46 +47,11 @@ end
 
 KLD = nn.KLDCriterion()
 
-weights, grads = model:parameters()
+parameters, gradients = model:getParameters()
 
-opfunc = function(batch)
-    model:zeroGradParameters()
-    local f = model:forward(batch)
-
-    local target = batch:reshape(batchSize,total_output_size)
-
-    local err = - criterion:forward(f, target)
-
-    local df_dw = - criterion:backward(f, target)
-
-    model:backward(batch,df_dw)
-    local encoder_output = model:get(1).output
-
-    if cuda then
-       encoder_output[1] = encoder_output[1]:double()
-       encoder_output[2] = encoder_output[2]:double()
-    end
-
-    local KLDerr = KLD:forward(encoder_output, target)
-    local dKLD_dw = KLD:backward(encoder_output, target)
-
-    if cuda then
-        dKLD_dw[1] = dKLD_dw[1]:cuda()
-        dKLD_dw[2] = dKLD_dw[2]:cuda()
-    end
-
-    encoder:backward(batch,dKLD_dw)
-
-    local lowerbound = err  + KLDerr
-    if opt.verbose then
-        print("BCE",err/batch:size(1))
-        print("KLD", KLDerr/batch:size(1))
-        print("lowerbound", lowerbound/batch:size(1))
-    end
-    
-
-    return weights, grads, lowerbound
-end
+config = {
+    learningRate = -0.02
+}
 
 function getLowerbound(data)
     local lowerbound = 0
@@ -113,7 +76,6 @@ function getLowerbound(data)
     return lowerbound
 end
 
-
 if opt.continue == true then 
     print("Loading old weights!")
     lowerboundlist = torch.load(opt.save ..        'lowerbound.t7')
@@ -130,7 +92,7 @@ if opt.continue == true then
     epoch = lowerboundlist:size(1)
 else
     epoch = 0
-    h = adaGradInit(trainData.data, opfunc, batchSize, initrounds)
+    state = {}
 end
 
 while true do
@@ -146,6 +108,7 @@ while true do
     for i = 1, N, batchSize do
         xlua.progress(i+batchSize-1, N)
 
+        --Prepare Batch
         local batch
 
         if cuda then
@@ -161,11 +124,56 @@ while true do
             k = k + 1
         end
 
-        batchlowerbound = adaGradUpdate(batch, N, learningRate, opfunc, h)
-        lowerbound = lowerbound + batchlowerbound
+        --Optimization function
+        local opfunc = function(x)
+            if x ~= parameters then
+                parameters:copy(x)
+            end
+
+            model:zeroGradParameters()
+            local f = model:forward(batch)
+
+            local target = batch:reshape(batchSize,total_output_size)
+            local err = - criterion:forward(f, target)
+            local df_dw = - criterion:backward(f, target)
+
+            model:backward(batch,df_dw)
+            local encoder_output = model:get(1).output
+
+            if cuda then
+               encoder_output[1] = encoder_output[1]:double()
+               encoder_output[2] = encoder_output[2]:double()
+            end
+
+            local KLDerr = KLD:forward(encoder_output, target)
+            local dKLD_dw = KLD:backward(encoder_output, target)
+
+            if cuda then
+                dKLD_dw[1] = dKLD_dw[1]:cuda()
+                dKLD_dw[2] = dKLD_dw[2]:cuda()
+            end
+
+            encoder:backward(batch,dKLD_dw)
+
+            local lowerbound = err  + KLDerr
+
+            if opt.verbose then
+                print("BCE",err/batch:size(1))
+                print("KLD", KLDerr/batch:size(1))
+                print("lowerbound", lowerbound/batch:size(1))
+            end
+
+            return lowerbound, gradients 
+        end
+
+        x, batchlowerbound = optim.adagrad(opfunc, parameters, config)
+
+        lowerbound = lowerbound + batchlowerbound[1]
     end
 
     print("Epoch: " .. epoch .. " Lowerbound: " .. lowerbound/N .. " time: " .. sys.clock() - time)
+
+    --Keep track of the lowerbound over time
     if lowerboundlist then
         lowerboundlist = torch.cat(lowerboundlist,torch.Tensor(1,1):fill(lowerbound/N),1)
     else
@@ -173,6 +181,7 @@ while true do
     end
 
 
+    --Compute the lowerbound of the test set and save it
     if epoch % 1 == 0 then
         lowerbound_test = getLowerbound(testData.data)
 
@@ -183,11 +192,11 @@ while true do
         end
 
         print('testlowerbound = ' .. lowerbound_test/N_test)
-        weights, gradients = model:getParameters()
 
+        --Save everything to be able to restart later
         torch.save(opt.save .. '/model', model)
         torch.save(opt.save .. '/weights.t7', weights)
-        torch.save(opt.save .. '/adagrad.t7', h)
+        torch.save(opt.save .. '/adagrad.t7', state)
         torch.save(opt.save .. '/lowerbound.t7', torch.Tensor(lowerboundlist))
         torch.save(opt.save .. '/lowerbound_test.t7', torch.Tensor(lowerbound_test_list))
     end
