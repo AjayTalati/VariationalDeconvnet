@@ -53,7 +53,7 @@ opfunc = function(batch)
     local f = model:forward(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
-    local target = batch:double():reshape(batchSize,total_output_size)
+    local target = batch:reshape(batchSize,total_output_size)
     local err = - criterion:forward(f, target)
 
     local df_dw = - criterion:backward(f, target)
@@ -96,8 +96,9 @@ function getLowerbound(data)
 
         local batch = data[{{i,iend},{}}]
         local f = model:forward(batch)
-        local target = batch:double():reshape(batchSize,total_output_size)
-        local err = criterion:forward(f, target)
+        local target = batch::reshape(batchSize,total_output_size)
+        local err = - criterion:forward(f, target)
+        -- print(err/batchSize)
 
         local encoder_output = model:get(1).output
         
@@ -107,6 +108,8 @@ function getLowerbound(data)
         end
 
         local KLDerr = KLD:forward(encoder_output, target)
+        -- print(KLDerr/batchSize)
+        -- io.read()
 
         lowerbound = lowerbound + err + KLDerr
     end
@@ -173,7 +176,6 @@ while true do
 
 
     if epoch % 1 == 0 then
-        
         lowerbound_test = getLowerbound(testData.data)
 
          if lowerbound_test_list then

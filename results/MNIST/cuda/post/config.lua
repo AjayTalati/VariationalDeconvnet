@@ -7,7 +7,7 @@ end
 
 ---Required 
 batchSize = 128 -- size of mini-batches
-learningRate = 0.005 -- Learning rate used in AdaGrad
+learningRate = 0.02 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
@@ -41,7 +41,7 @@ factor = 2
 
 encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
-encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+encoder:add(nn.SpatialConvolutionMM(colorchannels,feature_maps,filter_size,filter_size))
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 
