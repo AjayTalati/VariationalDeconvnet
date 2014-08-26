@@ -46,14 +46,17 @@ else
     criterion.sizeAverage = false
 
 end
+
 KLD = nn.KLDCriterion()
 
-opfunc = function(batch) 
+weights, grads = model:parameters()
+
+opfunc = function(batch)
     model:zeroGradParameters()
     local f = model:forward(batch)
-    -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
     local target = batch:reshape(batchSize,total_output_size)
+
     local err = - criterion:forward(f, target)
 
     local df_dw = - criterion:backward(f, target)
@@ -83,22 +86,18 @@ opfunc = function(batch)
         print("lowerbound", lowerbound/batch:size(1))
     end
     
-    local weights, grads = model:parameters()
 
     return weights, grads, lowerbound
 end
 
 function getLowerbound(data)
     local lowerbound = 0
-    for i = 1, data:size(1), batchSize do
-        local iend = math.min(data:size(1),i+batchSize-1)
-        --xlua.progress(iend, data:size(1))
-
-        local batch = data[{{i,iend},{}}]
+    N_data = data:size(1) - (data:size(1) % batchSize)
+    for i = 1, N_data, batchSize do
+        local batch = data[{{i,i+batchSize-1},{}}]
         local f = model:forward(batch)
-        local target = batch::reshape(batchSize,total_output_size)
+        local target = batch:reshape(batchSize,total_output_size)
         local err = - criterion:forward(f, target)
-        -- print(err/batchSize)
 
         local encoder_output = model:get(1).output
         
@@ -108,8 +107,6 @@ function getLowerbound(data)
         end
 
         local KLDerr = KLD:forward(encoder_output, target)
-        -- print(KLDerr/batchSize)
-        -- io.read()
 
         lowerbound = lowerbound + err + KLDerr
     end
@@ -141,24 +138,25 @@ while true do
     local lowerbound = 0
     local time = sys.clock()
     local shuffle = torch.randperm(trainData.data:size(1))
-    local N = trainData.data:size(1)
-    local N_test = testData.data:size(1)
+
+    --Make sure batches are always batchSize
+    local N = trainData.data:size(1) - (trainData.data:size(1) % batchSize)
+    local N_test = testData.data:size(1) - (testData.data:size(1) % batchSize)
 
     for i = 1, N, batchSize do
-        local iend = math.min(N,i+batchSize-1)
-        xlua.progress(iend, N)
+        xlua.progress(i+batchSize-1, N)
 
         local batch
 
         if cuda then
-            batch = torch.CudaTensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+            batch = torch.CudaTensor(batchSize,colorchannels,input_size,input_size)
         else 
-            batch = torch.Tensor(iend-i+1,trainData.data:size(2),input_size,input_size)
+            batch = torch.Tensor(batchSize,colorchannels,input_size,input_size)
         end
 
         local k = 1
 
-        for j = i,iend do
+        for j = i,i+batchSize-1 do
             batch[k] = trainData.data[shuffle[j]]:clone() 
             k = k + 1
         end

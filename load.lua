@@ -45,20 +45,13 @@ function loadCifar(trsize,tesize,pad)
 	return trainData,testData
 end
 
-function loadMnist(trsize,tesize)
-	data = torch.load('datasets/mnist-t7/mnist_tr.t7') 
+function loadMnist()
+	--From: http://data.neuflow.org/data/mnist.t7.tgz
+	local trainData = torch.load('datasets/mnist-t7/train_32x32.t7','ascii')
+	local testData = torch.load('datasets/mnist-t7/test_32x32.t7','ascii')
 
-	local trainData = {
-		data = data[{{1,trsize},{}}]
-	}
-
-	data = torch.load('datasets/mnist-t7/mnist_te.t7')
-
-	local testData = {
-		data = data[{{1,tesize},{}}]
-	}
-	trainData.data = trainData.data:reshape(trsize,1,28,28)
-	testData.data = testData.data:reshape(tesize,1,28,28)
+	trainData.data = trainData.data:double():div(255)
+	testData.data = testData.data:double():div(255)
 
 	return trainData, testData
 end

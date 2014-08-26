@@ -11,12 +11,9 @@ learningRate = 0.02 -- Learning rate used in AdaGrad
 
 initrounds = 10 -- Amount of intialization rounds in AdaGrad
 
-trsize = 50000-80 -- Size of training set
-tesize = 10000-16 -- Size of test set
-
 -- Loading data
 -- trainData is table with field 'data' which contains the data
-trainData, testData = loadMnist(trsize,tesize)
+trainData, testData = loadMnist()
 
 if cuda then
 	trainData.data = trainData.data:cuda()
@@ -26,7 +23,7 @@ end
 -- Model Specific parameters
 filter_size = 5
 dim_hidden = 30
-input_size = 28 --NB this is done later (line 129)
+input_size = 32 
 pad1 = 2 --NB new size must be divisible with filtersize
 pad2 = 2
 colorchannels = 1
@@ -35,7 +32,7 @@ feature_maps = 16
 
 hidden_dec = 25
 
-map_size = 14
+map_size = 16
 factor = 2
 
 
