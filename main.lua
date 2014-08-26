@@ -9,7 +9,6 @@ require 'KLDCriterion'
 require 'LinearCR'
 require 'Reparametrize'
 require 'SpatialDeconvolution'
-require 'BCECriterionC'
 
 require 'load'
 
@@ -43,7 +42,7 @@ end
 if continuous then
     criterion = nn.GaussianCriterion()
 else
-    criterion = nn.BCECriterionC()
+    criterion = nn.BCECriterion()
     criterion.sizeAverage = false
 
 end
@@ -55,9 +54,9 @@ opfunc = function(batch)
     -- local target = batch[{{},{},{3,34},{3,34}}]:reshape(100,total_output_size)
 
     local target = batch:double():reshape(batchSize,total_output_size)
-    local err = criterion:forward(f, target)
+    local err = - criterion:forward(f, target)
 
-    local df_dw = criterion:backward(f, target)
+    local df_dw = - criterion:backward(f, target)
 
     model:backward(batch,df_dw)
     local encoder_output = model:get(1).output
@@ -144,7 +143,7 @@ while true do
 
     for i = 1, N, batchSize do
         local iend = math.min(N,i+batchSize-1)
-        --xlua.progress(iend, N)
+        xlua.progress(iend, N)
 
         local batch
 

@@ -1,4 +1,4 @@
-cuda = true
+cuda = false
 
 if cuda then 
 	require 'cutorch'
@@ -47,28 +47,19 @@ map_size_2 = 7
 hidden_dec = 50
 hidden_dec_2 = 50
 
-
-
-
-
 --layer1
 encoder = nn.Sequential()
-encoder:add(nn.SpatialZeroPadding(2,2,2,2))
-encoder:add(nn.SpatialConvolution(colorchannels,feature_maps,filter_size,filter_size))
+-- encoder:add(nn.SpatialZeroPadding(2,2,2,2)) // added in next line last parameter
+encoder:add(nn.SpatialConvolutionMM(colorchannels,feature_maps,filter_size,filter_size,1,1,2))
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
 
 --layer2
 
-encoder:add(nn.SpatialZeroPadding(2,2,2,2)) 
-encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2))
+-- encoder:add(nn.SpatialZeroPadding(2,2,2,2)) // added in next line last parameter
+encoder:add(nn.SpatialConvolution(feature_maps,feature_maps_2,filter_size_2,filter_size_2,1,1,2))
 encoder:add(nn.SpatialMaxPooling(2,2,2,2))
 encoder:add(nn.Threshold(0,1e-6))
-
-
-
-
-
 
 encoder:add(nn.Reshape(feature_maps_2 * map_size_2^2))
 
@@ -81,9 +72,6 @@ encoder:add(z)
 local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps_2 * map_size_2^2))
 decoder:add(nn.Threshold(0,1e-6))
-
-
-
 
 --layer2
 decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size_2,map_size_2))
@@ -104,6 +92,7 @@ model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
+
 if cuda then
 	model:add(nn.Copy('torch.CudaTensor','torch.DoubleTensor'))
 
