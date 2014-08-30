@@ -63,7 +63,8 @@ function getLowerbound(data)
     for i = 1, N_data, batchSize do
         local batch = data[{{i,i+batchSize-1},{}}]
         local f = model:forward(batch)
-        local target = batch:reshape(batchSize,total_output_size)
+        local target = target or batch.new()
+        target:resizeAs(f):copy(batch)
         local err = - criterion:forward(f, target)
 
         local encoder_output = model:get(1).output
