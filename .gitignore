@@ -1,6 +1,5 @@
 cifar-10-batches-t7
 params
-datasets
 *.lua~
 *.swp
 model

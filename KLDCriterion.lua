@@ -7,30 +7,30 @@ end
 
 function KLDCriterion:updateOutput(input, target)
     -- 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-	self.term1 = self.term1 or input[1].new()
-   	self.term2 = self.term2 or input[2].new()
-	self.term3 = self.term3 or input[2].new()
+    self.term1 = self.term1 or input[1].new()
+    self.term2 = self.term2 or input[2].new()
+    self.term3 = self.term3 or input[2].new()
 
-	self.term1:resizeAs(input[1])
-	self.term2:resizeAs(input[2])
-	self.term3:resizeAs(input[2])
+    self.term1:resizeAs(input[1])
+    self.term2:resizeAs(input[2])
+    self.term3:resizeAs(input[2])
 
-	-- sigma^2
-	self.term1:copy(input[2]):exp()
+    -- sigma^2
+    self.term1:copy(input[2]):exp()
 
-	-- mu^2
-	self.term2:copy(input[1]):pow(2)
+    -- mu^2
+    self.term2:copy(input[1]):pow(2)
 
-	-- 1 + log(sigma^2)
-	self.term3:fill(1):add(input[2])
+    -- 1 + log(sigma^2)
+    self.term3:fill(1):add(input[2])
 
-	-- 1 + log(sigma^2) - mu^2
-	self.term3:add(-1,self.term2)
+    -- 1 + log(sigma^2) - mu^2
+    self.term3:add(-1,self.term2)
 
-	-- 1 + log(sigma^2) - mu^2 - sigma^2
-	self.term3:add(-1,self.term1)
+    -- 1 + log(sigma^2) - mu^2 - sigma^2
+    self.term3:add(-1,self.term1)
 
-	if self.sizeAverage then
+    if self.sizeAverage then
       self.term3:div(target:nElement())
    end
 
@@ -40,7 +40,7 @@ function KLDCriterion:updateOutput(input, target)
 end
 
 function KLDCriterion:updateGradInput(input, target)
-	self.gradInput = {}
+    self.gradInput = {}
 
     self.gradInput[1] = self.gradInput[1] or input[1].new()
     self.gradInput[1]:resizeAs(input[1])
