@@ -59,7 +59,3 @@ model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
-
-if opt.cuda then
-	model:cuda()
-end

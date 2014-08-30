@@ -7,7 +7,6 @@ end
 
 function KLDCriterion:updateOutput(input, target)
     -- 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-	
 	self.term1 = self.term1 or input[1].new()
    	self.term2 = self.term2 or input[2].new()
 	self.term3 = self.term3 or input[2].new()
@@ -41,18 +40,19 @@ function KLDCriterion:updateOutput(input, target)
 end
 
 function KLDCriterion:updateGradInput(input, target)
-	self.gradInput = {}
+	self.gradInput = self.gradInput or {}
 
-    self.gradInput[1] = input[1].new()
+    self.gradInput[1] = self.gradInput[1] or input[1].new()
     self.gradInput[1]:resizeAs(input[1])
-    self.gradInput[1]:copy(-input[1])
+    self.gradInput[1]:copy(input[1]):mul(-1)
 
-    self.term = input[2].new()
+
+    self.term = self.term or input[2].new()
     self.term:resizeAs(input[2])
     self.term:copy(input[2])
 
     -- (- sigma^2 + 1) * 0.5
-    self.gradInput[2] = (- self.term:exp()):add(1):mul(0.5)
+    self.gradInput[2] = self.term:exp():mul(-1):add(1):mul(0.5)
 
     return self.gradInput
 end

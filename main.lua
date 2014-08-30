@@ -44,6 +44,13 @@ end
 KLD = nn.KLDCriterion()
 KLD.sizeAverage = false
 
+if opt.cuda then
+    criterion:cuda()
+    KLD:cuda()
+    model:cuda()
+end
+
+
 parameters, gradients = model:getParameters()
 
 config = {
@@ -104,7 +111,7 @@ while true do
 
         --Prepare Batch
         local batch = torch.Tensor(batchSize,colorchannels,input_size,input_size)
-        
+
          if opt.cuda then
             batch = batch:cuda()
         end 
@@ -125,9 +132,11 @@ while true do
             model:zeroGradParameters()
             local f = model:forward(batch)
 
-            local target = batch:reshape(batchSize,total_output_size)
+            local target = target or batch.new()
+            target:resizeAs(f):copy(batch)
+
             local err = - criterion:forward(f, target)
-            local df_dw = - criterion:backward(f, target)
+            local df_dw = criterion:backward(f, target):mul(-1)
 
             model:backward(batch,df_dw)
             local encoder_output = model:get(1).output
