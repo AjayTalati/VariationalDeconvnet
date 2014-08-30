@@ -1,13 +1,12 @@
 --One layer deconvnet with padding
-if cuda then
-	require 'cutorch'
-	require 'cunn'
-end
 
 -- Loading data
 trainData, testData = loadMnist()
 
-if cuda then
+if opt.cuda then
+	require 'cutorch'
+	require 'cunn'
+
 	trainData.data = trainData.data:cuda()
 	testData.data = testData.data:cuda()
 end
@@ -61,6 +60,6 @@ model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
 
-if cuda then
+if opt.cuda then
 	model:cuda()
 end

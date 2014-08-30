@@ -112,7 +112,7 @@ while true do
             k = k + 1
         end
 
-        if cuda then
+        if opt.cuda then
             batch = batch:cuda()
         end 
 
