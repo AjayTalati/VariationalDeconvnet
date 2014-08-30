@@ -40,7 +40,7 @@ function KLDCriterion:updateOutput(input, target)
 end
 
 function KLDCriterion:updateGradInput(input, target)
-	self.gradInput = self.gradInput or {}
+	self.gradInput = {}
 
     self.gradInput[1] = self.gradInput[1] or input[1].new()
     self.gradInput[1]:resizeAs(input[1])
