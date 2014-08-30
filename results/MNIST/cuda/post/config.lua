@@ -5,7 +5,6 @@ if cuda then
 end
 
 -- Loading data
--- trainData is table with field 'data' which contains the data
 trainData, testData = loadMnist()
 
 if cuda then
@@ -17,7 +16,7 @@ end
 filter_size = 5
 dim_hidden = 30
 input_size = 32 
-pad1 = 2 --NB new size must be divisible with filtersize
+pad1 = 2 
 pad2 = 2
 colorchannels = 1
 total_output_size = colorchannels * input_size ^ 2
@@ -61,9 +60,7 @@ model = nn.Sequential()
 model:add(encoder)
 model:add(nn.Reparametrize(dim_hidden))
 model:add(decoder)
-if cuda then
-	model:add(nn.Copy('torch.CudaTensor', 'torch.DoubleTensor'))
 
-	encoder:cuda()
-	decoder:cuda()
+if cuda then
+	model:cuda()
 end

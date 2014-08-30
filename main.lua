@@ -21,16 +21,13 @@ cmd:text()
 cmd:text('Options:')
 cmd:option('-save', fname:gsub('.lua',''), 'subdirectory to save/log experiments in')
 cmd:option('-continue', false, 'load parameters from earlier training')
-cmd:option('-seed', 'yes', 'fixed input seed for repeatable experiments')
 cmd:option('-verbose', false, 'add verbosity, loooots of prints')
 cmd:option('-cuda', false, 'use CUDA modules')
 
 cmd:text()
 opt = cmd:parse(arg)
 
-if opt.seed == 'yes' then
-    torch.manualSeed(1)
-end
+torch.manualSeed(1)
 
 ---Required 
 batchSize = 128 
@@ -42,15 +39,15 @@ if continuous then
 else
     criterion = nn.BCECriterion()
     criterion.sizeAverage = false
-
 end
 
 KLD = nn.KLDCriterion()
+KLD.sizeAverage = false
 
 parameters, gradients = model:getParameters()
 
 config = {
-    learningRate = -0.02
+    learningRate = -0.01
 }
 
 function getLowerbound(data)
@@ -63,11 +60,6 @@ function getLowerbound(data)
         local err = - criterion:forward(f, target)
 
         local encoder_output = model:get(1).output
-        
-        if cuda then
-            encoder_output[1] = encoder_output[1]:double()
-            encoder_output[2] = encoder_output[2]:double()
-        end
 
         local KLDerr = KLD:forward(encoder_output, target)
 
@@ -76,6 +68,8 @@ function getLowerbound(data)
     return lowerbound
 end
 
+
+--Currently not working with new Adagrad
 if opt.continue == true then 
     print("Loading old weights!")
     lowerboundlist = torch.load(opt.save ..        'lowerbound.t7')
@@ -109,13 +103,7 @@ while true do
         xlua.progress(i+batchSize-1, N)
 
         --Prepare Batch
-        local batch
-
-        if cuda then
-            batch = torch.CudaTensor(batchSize,colorchannels,input_size,input_size)
-        else 
-            batch = torch.Tensor(batchSize,colorchannels,input_size,input_size)
-        end
+        local batch = torch.Tensor(batchSize,colorchannels,input_size,input_size)
 
         local k = 1
 
@@ -123,6 +111,10 @@ while true do
             batch[k] = trainData.data[shuffle[j]]:clone() 
             k = k + 1
         end
+
+        if cuda then
+            batch = batch:cuda()
+        end 
 
         --Optimization function
         local opfunc = function(x)
@@ -140,18 +132,8 @@ while true do
             model:backward(batch,df_dw)
             local encoder_output = model:get(1).output
 
-            if cuda then
-               encoder_output[1] = encoder_output[1]:double()
-               encoder_output[2] = encoder_output[2]:double()
-            end
-
             local KLDerr = KLD:forward(encoder_output, target)
             local dKLD_dw = KLD:backward(encoder_output, target)
-
-            if cuda then
-                dKLD_dw[1] = dKLD_dw[1]:cuda()
-                dKLD_dw[2] = dKLD_dw[2]:cuda()
-            end
 
             encoder:backward(batch,dKLD_dw)
 
@@ -166,7 +148,7 @@ while true do
             return lowerbound, gradients 
         end
 
-        x, batchlowerbound = optim.adagrad(opfunc, parameters, config)
+        x, batchlowerbound = optim.adagrad(opfunc, parameters, config, state)
 
         lowerbound = lowerbound + batchlowerbound[1]
     end
