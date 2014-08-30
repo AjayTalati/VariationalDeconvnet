@@ -104,6 +104,10 @@ while true do
 
         --Prepare Batch
         local batch = torch.Tensor(batchSize,colorchannels,input_size,input_size)
+        
+         if opt.cuda then
+            batch = batch:cuda()
+        end 
 
         local k = 1
 
@@ -111,10 +115,6 @@ while true do
             batch[k] = trainData.data[shuffle[j]]:clone() 
             k = k + 1
         end
-
-        if opt.cuda then
-            batch = batch:cuda()
-        end 
 
         --Optimization function
         local opfunc = function(x)
