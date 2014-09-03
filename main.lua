@@ -9,7 +9,6 @@ require 'KLDCriterion'
 
 require 'LinearCR'
 require 'Reparametrize'
-require 'SpatialDeconvolution'
 
 require 'load'
 
@@ -32,6 +31,13 @@ torch.manualSeed(1)
 ---Required 
 batchSize = 128 
 
+if opt.cuda then
+    require 'cutorch'
+    require 'cunn'
+end
+
+
+--Defines model
 require (opt.save .. '/config')
 
 if continuous then
@@ -44,10 +50,16 @@ end
 KLD = nn.KLDCriterion()
 KLD.sizeAverage = false
 
+-- Loading data
+trainData, testData = loadMnist()
+
 if opt.cuda then
     criterion:cuda()
     KLD:cuda()
     model:cuda()
+
+    trainData.data = trainData.data:cuda()
+    testData.data = testData.data:cuda()
 end
 
 

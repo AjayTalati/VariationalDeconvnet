@@ -1,16 +1,5 @@
 --One layer deconvnet with padding
 
--- Loading data
-trainData, testData = loadMnist()
-
-if opt.cuda then
-	require 'cutorch'
-	require 'cunn'
-
-	trainData.data = trainData.data:cuda()
-	testData.data = testData.data:cuda()
-end
-
 -- Model Specific parameters
 filter_size = 5
 dim_hidden = 30
@@ -45,17 +34,20 @@ local decoder = nn.Sequential()
 decoder:add(nn.LinearCR(dim_hidden, feature_maps * map_size * map_size))
 decoder:add(nn.Threshold(0,1e-6))
 
--- What to do with this?
-decoder:add(nn.Reshape(feature_maps,map_size,map_size))
+--Reshape and transpose in order to upscale
+decoder:add(nn.Reshape(batchSize, feature_maps, map_size, map_size))
 decoder:add(nn.Transpose({2,3},{3,4}))
---
 
-decoder:add(nn.Reshape(map_size*map_size*batchSize,feature_maps))
+--Reshape and compute upscale with hidden dimensions
+decoder:add(nn.Reshape(map_size * map_size * batchSize, feature_maps))
 decoder:add(nn.LinearCR(feature_maps,hidden_dec))
 decoder:add(nn.Threshold(0,1e-6))
-decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor))
 
+
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor*factor))
 decoder:add(nn.Sigmoid())
+
+
 decoder:add(nn.Reshape(batchSize,total_output_size))
 
 model = nn.Sequential()
