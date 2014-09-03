@@ -25,6 +25,10 @@ factor_2 = 2
 
 colorchannels = 1
 
+ --hidden_dec should be in order of: featuremaps * filtersize^2 / (16+factor^2)
+hidden_dec = 50
+hidden_dec_2 = 50
+
 --layer1
 encoder = nn.Sequential()
 encoder:add(nn.SpatialZeroPadding(pad1,pad2,pad1,pad2))
