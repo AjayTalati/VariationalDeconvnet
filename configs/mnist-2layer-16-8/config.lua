@@ -53,14 +53,19 @@ decoder:add(nn.Reshape(batchSize, feature_maps_2, map_size_2, map_size_2))
 decoder:add(nn.Transpose({2,3},{3,4}))
 
 --layer2
-decoder:add(nn.Reshape(map_size_2 * map_size_2 * batchSize, feature_maps_2))
-decoder:add(nn.LinearCR(feature_maps_2,feature_maps * factor_2 * factor_2))
+decoder:add(nn.Reshape(batchSize,feature_maps_2,map_size_2,map_size_2))
+decoder:add(nn.Transpose({2,3},{3,4}))
+decoder:add(nn.Reshape(map_size_2*map_size_2*batchSize,feature_maps_2))
+decoder:add(nn.LinearCR(feature_maps_2,hidden_dec_2))
 decoder:add(nn.Threshold(0,1e-6))
-
+decoder:add(nn.LinearCR(hidden_dec_2,feature_maps*factor*factor))
+decoder:add(nn.Threshold(0,1e-6))
 --layer1
-decoder:add(nn.Reshape(map_size * map_size *batchSize, feature_maps))
-decoder:add(nn.LinearCR(feature_maps,colorchannels * factor * factor))
+decoder:add(nn.LinearCR(feature_maps*factor*factor,hidden_dec))
+decoder:add(nn.Threshold(0,1e-6))
+decoder:add(nn.LinearCR(hidden_dec,colorchannels*factor^4)) 
 decoder:add(nn.Sigmoid())
+decoder:add(nn.Reshape(batchSize,total_output_size))
 
 decoder:add(nn.Reshape(batchSize, total_output_size))
 
