@@ -92,17 +92,13 @@ end
 --Currently not working with new Adagrad
 if opt.continue == true then 
     print("Loading old weights!")
-    lowerboundlist = torch.load(opt.save ..        'lowerbound.t7')
-    lowerbound_test_list =  torch.load(opt.save .. 'lowerbound_test.t7')
-    h = torch.load(opt.save .. 'adagrad.t7')
-    w = torch.load(opt.save .. 'weights.t7')
+    lowerboundlist = torch.load(opt.save ..        '/lowerbound.t7')
+    lowerbound_test_list =  torch.load(opt.save .. '/lowerbound_test.t7')
+    state = torch.load(opt.save .. '/state.t7')
+    p = torch.load(opt.save .. '/parameters.t7')
 
-    weights, gradients = model:getParameters()
+    parameters:copy(p)
 
-    weights:copy(w)
-    if opt.verbose then
-        print(weights:size())
-    end
     epoch = lowerboundlist:size(1)
 else
     epoch = 0
@@ -186,7 +182,7 @@ while true do
 
 
     --Compute the lowerbound of the test set and save it
-    if epoch % 1 == 0 then
+    if epoch % 2 == 0 then
         lowerbound_test = getLowerbound(testData.data)
 
          if lowerbound_test_list then
@@ -198,9 +194,8 @@ while true do
         print('testlowerbound = ' .. lowerbound_test/N_test)
 
         --Save everything to be able to restart later
-        torch.save(opt.save .. '/model', model)
-        torch.save(opt.save .. '/weights.t7', weights)
-        torch.save(opt.save .. '/adagrad.t7', state)
+        torch.save(opt.save .. '/parameters.t7', parameters)
+        torch.save(opt.save .. '/state.t7', state)
         torch.save(opt.save .. '/lowerbound.t7', torch.Tensor(lowerboundlist))
         torch.save(opt.save .. '/lowerbound_test.t7', torch.Tensor(lowerbound_test_list))
     end
