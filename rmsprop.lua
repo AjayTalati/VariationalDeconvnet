@@ -41,8 +41,10 @@ function rmsprop(opfunc, x, config, state)
    state.m:mul(1 - b1)
 
    -- New term 
-   momentum_dfdx = torch.Tensor():typeAs(dfdx):resizeAs(dfdx):copy(dfdx)
-   state.m:add(momentum_dfdx:mul(b1))
+   state.momentum_dfdx = state.momentum_dfdx or torch.Tensor():typeAs(dfdx):resizeAs(dfdx)
+   state.momentum_dfdx:copy(dfdx)
+
+   state.m:add(state.momentum_dfdx:mul(b1))
 
    -- Decay term of update
    state.v:mul(1 - b2)
@@ -55,14 +57,20 @@ function rmsprop(opfunc, x, config, state)
    -- calculate update step
    state.evalCounter = state.evalCounter + 1
 
-   update = torch.cdiv(state.m,torch.sqrt(state.v + 1e-8))
+   --Might CUDA
+   state.momentum_update = state.momentum_update or torch.Tensor():typeAs(state.m):resizeAs(state.m)
+   state.momentum_update:copy(state.m)
+
+   state.update = state.update or torch.Tensor():typeAs(state.v):resizeAs(state.v)
+   state.update:copy(state.v)
+
+   state.momentum_update:cdiv(state.update:add(1e-8):sqrt())
 
    -- No idea if and how this works on CUDA
-   gamma = math.sqrt(1 - math.pow(1 - b2,state.evalCounter))/(1 - math.pow(1 - b1, state.evalCounter))
-   update:mul(gamma)
+   local gamma = (math.sqrt(1 - math.pow(1 - b2,state.evalCounter))/(1 - math.pow(1 - b1, state.evalCounter)))
+   state.momentum_update:mul(gamma)
 
-   x:add(-lr, update) -- NOT CUDA PROOF
-
+   x:add(-lr, state.momentum_update)
 
    -- return x*, f(x) before optimization
    return x,{fx}

@@ -2,8 +2,7 @@ require 'sys'
 require 'xlua'
 require 'torch'
 require 'nn'
-require 'optim'
-
+require 'rmsprop'
 
 require 'KLDCriterion'
 
@@ -66,7 +65,9 @@ end
 parameters, gradients = model:getParameters()
 
 config = {
-    learningRate = -0.01
+    learningRate = -0.001,
+    momentumDecay = 0.1,
+    updateDecay = 0.01
 }
 
 function getLowerbound(data)
@@ -89,7 +90,6 @@ function getLowerbound(data)
 end
 
 
---Currently not working with new Adagrad
 if opt.continue == true then 
     print("Loading old weights!")
     lowerboundlist = torch.load(opt.save ..        '/lowerbound.t7')
@@ -134,6 +134,8 @@ while true do
 
         --Optimization function
         local opfunc = function(x)
+            collectgarbage()
+
             if x ~= parameters then
                 parameters:copy(x)
             end
@@ -166,7 +168,8 @@ while true do
             return lowerbound, gradients 
         end
 
-        x, batchlowerbound = optim.adagrad(opfunc, parameters, config, state)
+        x, batchlowerbound = rmsprop(opfunc, parameters, config, state)
+        print(batchlowerbound[1]/batchSize)
 
         lowerbound = lowerbound + batchlowerbound[1]
     end
