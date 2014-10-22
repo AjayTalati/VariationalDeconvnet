@@ -169,7 +169,6 @@ while true do
         end
 
         x, batchlowerbound = rmsprop(opfunc, parameters, config, state)
-        print(batchlowerbound[1]/batchSize)
 
         lowerbound = lowerbound + batchlowerbound[1]
     end

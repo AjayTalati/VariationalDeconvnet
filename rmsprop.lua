@@ -34,8 +34,8 @@ function rmsprop(opfunc, x, config, state)
    local fx, dfdx = opfunc(x)
 
    state.evalCounter = state.evalCounter or 0
-   state.m = state.m or torch.Tensor():resizeAs(dfdx):fill(0)
-   state.v = state.v or torch.Tensor():resizeAs(dfdx):fill(0)
+   state.m = state.m or torch.Tensor():typeAs(dfdx):resizeAs(dfdx):fill(0)
+   state.v = state.v or torch.Tensor():typeAs(dfdx):resizeAs(dfdx):fill(0)
    
    -- Decay term
    state.m:mul(1 - b1)
