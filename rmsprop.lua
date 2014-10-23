@@ -27,7 +27,6 @@ function rmsprop(opfunc, x, config, state)
    local config = config or {}
    local state = state or config
    local lr = config.learningRate or 1e-3
-   -- local lrd = config.learningRateDecay or 0
    local b1 = config.momentumDecay or 1
    local b2 = config.updateDecay or 1
 
@@ -57,7 +56,7 @@ function rmsprop(opfunc, x, config, state)
    -- calculate update step
    state.evalCounter = state.evalCounter + 1
 
-   --Might CUDA
+   --Create new momentum Tensors for cutorch compatibility
    state.momentum_update = state.momentum_update or torch.Tensor():typeAs(state.m):resizeAs(state.m)
    state.momentum_update:copy(state.m)
 
@@ -66,7 +65,6 @@ function rmsprop(opfunc, x, config, state)
 
    state.momentum_update:cdiv(state.update:add(1e-8):sqrt())
 
-   -- No idea if and how this works on CUDA
    local gamma = (math.sqrt(1 - math.pow(1 - b2,state.evalCounter))/(1 - math.pow(1 - b1, state.evalCounter)))
    state.momentum_update:mul(gamma)
 
